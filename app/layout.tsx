@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import { Inter, Lora } from "next/font/google";
-import "./globals.css";
-// LeafletのCSSを読み込む
-import "leaflet/dist/leaflet.css"; 
+import "./globals.css"; // ← ★この行が絶対に必要です！
+import "leaflet/dist/leaflet.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const lora = Lora({ subsets: ["latin"], variable: "--font-lora", style: ["normal", "italic"] });
