@@ -32,8 +32,8 @@ export default async function CityPage({ params, searchParams }: Props) {
   const { tags } = await searchParams;
   
   const decodedCityName = decodeURIComponent(cityName);
-  // タグがカンマ区切りで来るので配列に戻す
-  const tagList = typeof tags === 'string' ? tags.split(',') : [];
+  // タグがカンマ区切りで来るので配列に戻す。これが「選択されたタグ」です。
+  const tagList = typeof tags === 'string' ? tags.split(',').filter(Boolean) : [];
 
   // ★ここでサーバー側でデータを取得！ (ユーザーのブラウザは待機中)
   // loading.tsxを作れば、この待機中にローディング画面が出せます
@@ -64,7 +64,8 @@ export default async function CityPage({ params, searchParams }: Props) {
       />
       
       {/* データをクライアントコンポーネントに渡して表示 */}
-      <DashboardClient initialData={locationData} />
+      {/* selectedTags として URL から取得したタグリストを渡します */}
+      <DashboardClient initialData={locationData} selectedTags={tagList} />
     </>
   );
 }

@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState } from 'react';
 import Icon from './Icon';
 
 interface HeroProps {
@@ -9,103 +9,85 @@ interface HeroProps {
     headerImageUrl: string;
 }
 
-const ShareMenu: React.FC<{ locationName: string; onClose: () => void }> = ({ locationName, onClose }) => {
-    const shareUrl = window.location.href;
-    const shareText = `${locationName}の旅行情報をチェック！`;
-
-    const handleTwitterShare = () => {
-        const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(shareUrl)}`;
-        window.open(twitterUrl, '_blank', 'width=550,height=420');
-        onClose();
-    };
-
-    const handleLineShare = () => {
-        const lineUrl = `https://social-plugins.line.me/lineit/share?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(shareText)}`;
-        window.open(lineUrl, '_blank', 'width=550,height=420');
-        onClose();
-    };
-
-    return (
-        <div className="absolute top-full right-0 mt-2 bg-white dark:bg-surface-dark rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 py-2 min-w-[160px] z-50">
-            <button
-                onClick={handleTwitterShare}
-                className="w-full px-4 py-3 text-left hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-3 transition-colors"
-            >
-                <Icon name="share" className="text-blue-500" />
-                <span className="text-slate-700 dark:text-slate-200 font-medium">X（Twitter）</span>
-            </button>
-            <button
-                onClick={handleLineShare}
-                className="w-full px-4 py-3 text-left hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-3 transition-colors"
-            >
-                <Icon name="chat" className="text-green-500" />
-                <span className="text-slate-700 dark:text-slate-200 font-medium">LINE</span>
-            </button>
-        </div>
-    );
-};
-
 const Hero: React.FC<HeroProps> = ({ locationName, subtitle, tags, headerImageUrl }) => {
-    const [isShareMenuOpen, setIsShareMenuOpen] = useState(false);
-    const shareButtonRef = useRef<HTMLButtonElement>(null);
-    const menuRef = useRef<HTMLDivElement>(null);
+    const [showShareMenu, setShowShareMenu] = useState(false);
 
-    useEffect(() => {
-        const handleClickOutside = (event: MouseEvent) => {
-            if (
-                menuRef.current &&
-                shareButtonRef.current &&
-                !menuRef.current.contains(event.target as Node) &&
-                !shareButtonRef.current.contains(event.target as Node)
-            ) {
-                setIsShareMenuOpen(false);
+    const handleShare = async (platform: string) => {
+        const url = window.location.href;
+        const text = `${locationName}の観光・経済・歴史データ | MachiLogue`;
+
+        if (platform === 'twitter') {
+            window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}&url=${encodeURIComponent(url)}`, '_blank');
+        } else if (platform === 'facebook') {
+            window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
+        } else if (platform === 'copy') {
+            try {
+                await navigator.clipboard.writeText(url);
+                alert('URLをコピーしました！');
+            } catch (err) {
+                console.error('コピーに失敗しました', err);
             }
-        };
-
-        if (isShareMenuOpen) {
-            document.addEventListener('mousedown', handleClickOutside);
         }
-
-        return () => {
-            document.removeEventListener('mousedown', handleClickOutside);
-        };
-    }, [isShareMenuOpen]);
+        setShowShareMenu(false);
+    };
 
     return (
-        <header className="relative z-10 h-[400px] lg:h-[450px] w-full overflow-hidden">
-            <img alt={`${locationName} skyline`} className="absolute inset-0 w-full h-full object-cover" src={headerImageUrl} />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/10"></div>
-            <div className="absolute bottom-0 left-0 w-full p-6 lg:p-12 pb-8 max-w-7xl mx-auto">
-                <div className="flex flex-col gap-3">
-                    <div className="flex flex-wrap gap-2">
-                        {tags.map((tag, index) => (
-                             <span key={index} className={`px-3 py-1 text-white text-xs font-bold tracking-wider rounded-md uppercase shadow-sm ${index === 0 ? 'bg-gold' : 'bg-gray-800/60 backdrop-blur-md border border-white/20'}`}>
-                                {tag}
-                            </span>
-                        ))}
-                    </div>
-                    <div className="flex items-center gap-4 flex-wrap">
-                        <h1 className="text-5xl lg:text-6xl font-bold text-white tracking-tight drop-shadow-md">{locationName}</h1>
-                        <div className="relative">
-                            <button
-                                ref={shareButtonRef}
-                                onClick={() => setIsShareMenuOpen(!isShareMenuOpen)}
-                                className="p-2 rounded-full bg-white/20 hover:bg-white/30 backdrop-blur-md border border-white/30 text-white transition-all hover:scale-110 flex items-center justify-center"
-                                aria-label="シェア"
-                            >
-                                <Icon name="share" className="text-lg" />
-                            </button>
-                            {isShareMenuOpen && (
-                                <div ref={menuRef} className="absolute z-50">
-                                    <ShareMenu locationName={locationName} onClose={() => setIsShareMenuOpen(false)} />
-                                </div>
-                            )}
+        <div className="relative w-full h-[400px] overflow-hidden">
+            {/* 背景画像 */}
+            <div 
+                className="absolute inset-0 bg-cover bg-center transition-transform duration-700 hover:scale-105"
+                style={{ backgroundImage: `url(${headerImageUrl})` }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
+
+            <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-full flex flex-col justify-end pb-8">
+                <div className="flex justify-between items-end">
+                    <div>
+                        <div className="flex flex-wrap gap-2 mb-3">
+                            {tags.map((tag, index) => (
+                                <span key={index} className="px-3 py-1 bg-white/20 backdrop-blur-md text-white text-sm rounded-full border border-white/30">
+                                    #{tag}
+                                </span>
+                            ))}
                         </div>
+                        <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-2 tracking-tight shadow-sm">
+                            {locationName}
+                        </h1>
+                        <p className="text-lg text-gray-200 max-w-2xl font-light leading-relaxed">
+                            {subtitle}
+                        </p>
                     </div>
-                    <p className="text-white/90 text-lg lg:text-xl font-light">{subtitle}</p>
+
+                    {/* SNS共有ボタン (Hero右下に配置) */}
+                    <div className="relative mb-2">
+                         <button 
+                            onClick={() => setShowShareMenu(!showShareMenu)}
+                            className="p-3 bg-white/20 hover:bg-white/30 backdrop-blur-md border border-white/30 rounded-full text-white transition-all shadow-lg"
+                        >
+                            <Icon name="ios_share" />
+                        </button>
+                        
+                        {showShareMenu && (
+                            <>
+                                <div className="fixed inset-0 z-40" onClick={() => setShowShareMenu(false)} />
+                                <div className="absolute right-0 bottom-full mb-2 w-48 bg-white dark:bg-surface-dark rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 py-2 z-50 animate-in fade-in zoom-in-95">
+                                    <button onClick={() => handleShare('twitter')} className="w-full px-4 py-2.5 text-left flex items-center gap-3 hover:bg-gray-50 dark:hover:bg-gray-800 text-slate-700 dark:text-slate-200">
+                                        <span className="font-bold text-blue-400">X</span> Twitter
+                                    </button>
+                                    <button onClick={() => handleShare('facebook')} className="w-full px-4 py-2.5 text-left flex items-center gap-3 hover:bg-gray-50 dark:hover:bg-gray-800 text-slate-700 dark:text-slate-200">
+                                        <span className="font-bold text-blue-600">f</span> Facebook
+                                    </button>
+                                    <div className="h-px bg-gray-100 dark:bg-gray-700 my-1"></div>
+                                    <button onClick={() => handleShare('copy')} className="w-full px-4 py-2.5 text-left flex items-center gap-3 hover:bg-gray-50 dark:hover:bg-gray-800 text-slate-700 dark:text-slate-200">
+                                        <Icon name="content_copy" className="text-sm" /> URLコピー
+                                    </button>
+                                </div>
+                            </>
+                        )}
+                    </div>
                 </div>
             </div>
-        </header>
+        </div>
     );
 };
 
