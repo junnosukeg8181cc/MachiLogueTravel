@@ -1,6 +1,5 @@
 import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
-import { LocationData } from "@/types"; // さっき作った型定義を読み込み
-// ★追加: Reactのcache機能をインポート
+import { LocationData } from "@/types";
 import { cache } from 'react';
 
 // サーバー側の環境変数からキーを取得
@@ -98,31 +97,49 @@ const locationSchema = {
     required: ["locationName", "englishLocationName", "subtitle", "tags", "economicSnapshot", "majorIndustries", "historicalTimeline", "travelPlan", "deepDive", "tourismInfo"],
 };
 
-// ★修正: 関数全体を cache() でラップしました
+// 関数全体を cache() でラップ
 export const fetchLocationData = cache(async (location: string, tags: string[] = []): Promise<LocationData> => {
-    // サーバーサイドなのでconsole.logはサーバーのターミナルに出ます
     console.log(`Fetching data for: ${location}`);
 
-    // ★指定通り、モデル名は変更していません
+    // モデルリスト（順序は維持：標準モデルを最優先）
     const modelsToTry = [
         "gemini-2.5-flash-lite", // エース
+        "gemini-3-flash",
         "gemini-2.5-flash",
-        "gemini-3-flash-preview", // ちょっと賢い版
-    ]
+        "gemini-3-flash-preview", // ちょっと賢い版 
+    ];
 
+    // 旧サイトのロジックを移植：タグがある場合の詳細指示
     const tagsInstruction = tags.length > 0 
-        ? `\n**ユーザーの関心テーマ:** ${tags.join(', ')}に関連する情報を優先してください。` 
+        ? `\n**【最重要】ユーザーの関心テーマ:**\nユーザーは特に以下の分野に興味があります: ${tags.join(', ')}。\n歴史タイムライン、Deep Dive (fullStory)、旅行プランを作成する際は、これらのテーマに関連する出来事やスポット、文脈を優先的に取り上げてください。` 
         : "";
 
+    // 旧サイトのプロンプトをベースに、文字数要件を「2000文字」へ強化
     const prompt = `
-        Role: トラベルジャーナリスト兼経済アナリスト。
-        Objective: 「${location}」のデータを生成する。
+        Role: 世界のトップトラベルジャーナリスト兼経済アナリスト。
+        Objective: 「${location}」の観光・経済・歴史データを生成する。
+
         ${tagsInstruction}
-        Rules:
-        1. 日本語で出力。
-        2. アイコン名(icon)は英語のsnake_case (例: "history_edu")。
-        3. Deep Diveは2000文字程度の長編記事風に。
-        4. tourismInfoのcurrencyCodeは3文字のISOコード(USD, JPY等)必須。
+
+        **【重要】言語とアイコンのルール (Strict Rules):**
+        1. **文章はすべて日本語**で出力してください。
+        2. **ただし、アイコン名 (icon fields) だけは絶対に翻訳しないでください！**
+            - Google Material Icons の公式名（英語のsnake_case）をそのまま使ってください。
+            - OK: "history_edu", "attach_money", "train"
+            - NG: "歴史", "お金", "電車", "Train" (大文字NG)
+        
+        **データ生成ルール:**
+        - **Deep Dive (fullStory):** 読者を惹き込む「1000文字以上の長編レポート」が必要です。
+           単なる羅列ではなく、以下の5つの視点を**それぞれ200文字以上**深く掘り下げて、一つの物語として構成してください。
+           1. 【歴史の深層】: 起源から現代に至るまでのドラマチックな変遷
+           2. 【経済の鼓動】: 産業構造の変化と、それが人々の生活にどう影響しているか
+           3. 【文化と人々】: 地元の人しか知らない風習、食文化、気質
+           4. 【知られざる側面】: 一般的なガイドブックには載らない裏話や課題
+           5. 【未来への展望】: この都市が今後どう変わっていくかの予測
+        - **数値データ:** 推定値で良いので、必ず具体的な数字を入れてください（"不明"はNG）。
+        - **観光情報 (tourismInfo):** - 緯度経度は正確な数値で出力してください。
+            - currencyCodeは必ず3文字のISOコード（例: USD）で出力してください。
+            - 観光情報サマリは日本語で300文字程度で記述してください。
     `;
 
     for (const modelId of modelsToTry) {
