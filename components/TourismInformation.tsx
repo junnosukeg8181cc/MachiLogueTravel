@@ -1,6 +1,15 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import CityMap from './CityMap';
+// ★修正: 普通のimportを削除
+// import CityMap from './CityMap'; 
+
+// ★修正: next/dynamicを使って、サーバー側での読み込みを無効化(ssr: false)する
+import dynamic from 'next/dynamic';
+const CityMap = dynamic(() => import('./CityMap'), { 
+    ssr: false,
+    loading: () => <div className="h-[400px] bg-gray-100 dark:bg-gray-800 animate-pulse rounded-xl" />
+});
+
 import WeatherForecast from './WeatherForecast';
 import MajorIndustries from './MajorIndustries';
 import EconomicSnapshot from './EconomicSnapshot';
@@ -20,6 +29,7 @@ const TourismInformation: React.FC<TourismInformationProps> = ({
     industries,
     economicSnapshot
 }) => {
+    // ... (以下のコードは変更なし。そのまま維持してください) ...
     const {
         latitude,
         longitude,

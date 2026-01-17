@@ -104,8 +104,8 @@ export const fetchLocationData = cache(async (location: string, tags: string[] =
     // モデルリスト（順序は維持：標準モデルを最優先）
     const modelsToTry = [
         "gemini-2.5-flash-lite", // エース
-        "gemini-3-flash",
         "gemini-2.5-flash",
+        "gemini-3-flash",
         "gemini-3-flash-preview", // ちょっと賢い版 
     ];
 

@@ -3,6 +3,8 @@ import { fetchLocationData } from '@/lib/gemini';
 import DashboardClient from '@/components/DashboardClient';
 import type { Metadata } from 'next';
 
+export const maxDuration = 30;
+
 // ページのPropsの型定義
 type Props = {
   params: Promise<{ cityName: string }>;
