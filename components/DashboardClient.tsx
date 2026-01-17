@@ -10,7 +10,8 @@ import Tabs from './Tabs';
 import HistoryPage from './HistoryPage';
 import PlanPage from './PlanPage';
 import TourismInformation from './TourismInformation';
-import type { LocationData } from '@/types';
+// ★修正1: Tab型もここからインポート（重複定義を避けるため）
+import type { LocationData, Tab } from '@/types';
 
 // 地図コンポーネントを動的にインポート（SSR回避）
 const CityMap = dynamic(() => import('./CityMap'), { 
@@ -18,7 +19,7 @@ const CityMap = dynamic(() => import('./CityMap'), {
   loading: () => <div className="h-[400px] bg-gray-100 animate-pulse rounded-2xl" />
 });
 
-type Tab = 'tourism' | 'history' | 'plan';
+// ★修正2: ここにあった `type Tab = ...` は削除しました
 
 interface Props {
   initialData: LocationData;
@@ -104,6 +105,8 @@ const DashboardClient: React.FC<Props> = ({ initialData, selectedTags }) => {
                     subtitle={initialData.subtitle}
                     tags={initialData.tags}
                     headerImageUrl={initialData.headerImageUrl}
+                    // ★修正3: SNSシェア用に旅程データを渡す
+                    travelPlan={initialData.travelPlan}
                 />
                 
                 {/* ★ここに「動かない目印」を設置 */}
