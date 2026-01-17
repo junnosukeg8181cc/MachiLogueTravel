@@ -101,20 +101,16 @@ const locationSchema = {
 export const fetchLocationData = cache(async (location: string, tags: string[] = []): Promise<LocationData> => {
     console.log(`Fetching data for: ${location}`);
 
-    // ★修正1: 確実に動作するモデルのみ指定
-    // gemini-2.5や3はまだAPIで安定していないか存在しないため、1.5系を使用
-    const modelsToTry = [
-        "gemini-2.5-flash-lite", // エース
-        "gemini-2.5-flash",
-        "gemini-3-flash-preview", // ちょっと賢い版 
-    ];
+    // ★修正ポイント: ループ廃止＆安定版モデル(1.5-flash)に固定
+    // これにより、1回のリクエスト失敗で即座にエラーを返し、API制限(429)の連鎖を防ぐ
+    const modelId = "gemini-2.5-flash";
 
-    // 旧サイトのロジックを移植：タグがある場合の詳細指示
+    // タグがある場合の詳細指示
     const tagsInstruction = tags.length > 0 
         ? `\n**【最重要】ユーザーの関心テーマ:**\nユーザーは特に以下の分野に興味があります: ${tags.join(', ')}。\n歴史タイムライン、Deep Dive (fullStory)、旅行プランを作成する際は、これらのテーマに関連する出来事やスポット、文脈を優先的に取り上げてください。` 
         : "";
 
-    // 旧サイトのプロンプトをベースに、文字数要件を「2000文字」へ強化
+    // プロンプト定義
     const prompt = `
         Role: 世界のトップトラベルジャーナリスト兼経済アナリスト。
         Objective: 「${location}」の観光・経済・歴史データを生成する。
@@ -142,38 +138,31 @@ export const fetchLocationData = cache(async (location: string, tags: string[] =
             - 観光情報サマリは日本語で300文字程度で記述してください。
     `;
 
-    for (const modelId of modelsToTry) {
-        try {
-            const model = genAI.getGenerativeModel({
-                model: modelId,
-                generationConfig: {
-                    responseMimeType: "application/json",
-                    responseSchema: locationSchema as any,
-                }
-            });
-
-            const result = await model.generateContent(prompt);
-            const response = await result.response;
-            const jsonText = response.text();
-            
-            if (!jsonText) throw new Error("Empty response");
-            
-            const data = JSON.parse(jsonText);
-            const imageUrl = await fetchImageFromUnsplash(data.englishLocationName || location);
-
-            return { ...data, headerImageUrl: imageUrl } as LocationData;
-
-        } catch (error: any) {
-            console.warn(`Model ${modelId} failed:`, error.message);
-            
-            // ★修正2: レートリミット対策のためのSleep処理
-            // 最後のモデルでなければ、次のモデルを試す前に2秒待機する
-            if (modelsToTry.indexOf(modelId) < modelsToTry.length - 1) {
-                console.log("Waiting 2s before switching model to avoid Rate Limit...");
-                await new Promise(resolve => setTimeout(resolve, 2000));
+    try {
+        // モデルのインスタンス化
+        const model = genAI.getGenerativeModel({
+            model: modelId,
+            generationConfig: {
+                responseMimeType: "application/json",
+                responseSchema: locationSchema as any,
             }
-        }
-    }
+        });
 
-    throw new Error("データの取得に失敗しました。");
+        // データ生成実行（リトライなしの一発勝負）
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const jsonText = response.text();
+        
+        if (!jsonText) throw new Error("Empty response");
+        
+        const data = JSON.parse(jsonText);
+        const imageUrl = await fetchImageFromUnsplash(data.englishLocationName || location);
+
+        return { ...data, headerImageUrl: imageUrl } as LocationData;
+
+    } catch (error: any) {
+        console.error(`Gemini API Error (${modelId}):`, error.message);
+        // レートリミット等のエラーが出た場合は、リトライせずにエラーを投げる
+        throw new Error("API制限またはエラーによりデータの取得に失敗しました。しばらく時間を置いてから再試行してください。");
+    }
 });
