@@ -54,7 +54,7 @@ const DeepDiveCard: React.FC<{ deepDive: DeepDive }> = ({ deepDive }) => {
 
 // --- Main HistoryPage Component ---
 const HistoryPage: React.FC<{ events: TimelineEvent[], deepDive: DeepDive }> = ({ events, deepDive }) => {
-    
+
     if (!events || events.length === 0) {
         return <p className="p-8 text-center text-slate-500">歴史データがありません。</p>;
     }
@@ -69,13 +69,14 @@ const HistoryPage: React.FC<{ events: TimelineEvent[], deepDive: DeepDive }> = (
                     <div className="relative">
                         {events.map((event, index) => (
                             <div key={`${event.title}-${index}`} className="relative flex gap-8 pb-12 last:pb-0">
-                                {/* 線の修正: 左端から24px(w-12の中心)の位置に線を配置 */}
+                                {/* ... (線の描画部分はそのまま) ... */}
                                 {index < events.length - 1 && (
                                     <div className="absolute top-12 bottom-0 left-6 -ml-px w-[2px] bg-slate-100 dark:bg-slate-800"></div>
                                 )}
                                 <div className="z-10 flex-shrink-0">
                                     <div className={`w-12 h-12 rounded-full border-4 border-white dark:border-slate-900 flex items-center justify-center shadow-sm ${getIconColor(event.title)}`}>
-                                        <Icon name={event.icon} className="text-xl" />
+                                        {/* ★修正: text-xl に leading-none を追加 */}
+                                        <Icon name={event.icon} className="text-xl leading-none" />
                                     </div>
                                 </div>
                                 <div className="pt-2 flex-1">

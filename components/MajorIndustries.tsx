@@ -23,7 +23,8 @@ const MajorIndustries: React.FC<MajorIndustriesProps> = ({ industries }) => {
                 {industries.map((industry) => (
                     <div key={industry.name} className="bg-white dark:bg-surface-dark border border-gray-100 dark:border-gray-700 rounded-xl p-4 flex flex-col items-center justify-center gap-2 hover:border-primary/50 transition cursor-default shadow-sm group">
                         <div className={`w-12 h-12 flex items-center justify-center rounded-lg group-hover:scale-110 transition-transform ${iconColors[industry.colorKey] || iconColors['Other']}`}>
-                            <Icon name={industry.icon} />
+                            {/* ★修正: サイズ指定(text-3xl)と leading-none を追加 */}
+                            <Icon name={industry.icon} className="text-3xl leading-none" />
                         </div>
                         <span className="font-medium text-slate-800 dark:text-slate-200 text-center text-sm">{industry.name}</span>
                     </div>
