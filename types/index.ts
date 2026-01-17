@@ -1,3 +1,5 @@
+export type SearchTag = '金融' | 'トレンド' | 'アート' | '民俗' | '交通・インフラ' | 'グルメ' | '人口流体';
+
 export interface EconomicMetric {
   value: string;
   currency?: string;
