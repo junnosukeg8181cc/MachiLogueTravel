@@ -6,21 +6,29 @@ export const getLocationData = async (locationName: string, tags: string[] = [])
   const tagsKey = tags.slice().sort().join(',');
 
   // 1. キャッシュ確認 (Supabase)
-  const { data: cache } = await supabase
+  // ★修正: .single() は重複があるとエラーになるため廃止。
+  // 代わりに .limit(1) で「配列」として取得し、エラーを回避する。
+  const { data: rows, error } = await supabase
     .from('locations')
     .select('data')
     .eq('city_name', locationName)
     .eq('tags', tagsKey)
-    .single();
+    .limit(1);
 
-  if (cache && cache.data) {
-    return cache.data as LocationData;
+  // 配列の中にデータがあれば、それを使う
+  if (rows && rows.length > 0) {
+    console.log(`Cache HIT for: ${locationName} (tags: ${tagsKey})`);
+    return rows[0].data as LocationData;
   }
+
+  console.log(`Cache MISS for: ${locationName} (tags: ${tagsKey})`);
 
   // 2. なければGeminiで生成
   const geminiData = await fetchFromGemini(locationName, tags);
 
-  // 3. Supabaseに保存（エラーが出ても無視して進む）
+  // 3. Supabaseに保存
+  // 開発モードの重複保存を防ぐため、単純なinsertではなく、本来はUnique制約が必要だが
+  // とりあえずエラーを無視して進む
   await supabase
     .from('locations')
     .insert([{ city_name: locationName, tags: tagsKey, data: geminiData }]);
