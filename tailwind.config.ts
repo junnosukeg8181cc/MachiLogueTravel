@@ -19,6 +19,9 @@ const config: Config = {
         gold: "#D9A54C",
       },
       fontFamily: {
+        // ★ここを修正！
+        // sans（基本のフォント）に Inter を割り当てます
+        sans: ["var(--font-inter)", "sans-serif"],
         display: ["var(--font-inter)", "sans-serif"],
         serif: ["var(--font-lora)", "serif"],
       },

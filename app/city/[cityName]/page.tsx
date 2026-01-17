@@ -1,5 +1,6 @@
 import React from 'react';
-import { fetchLocationData } from '@/lib/gemini';
+// Supabase処理が入ったactionsから呼ぶ
+import { getLocationData } from '@/lib/actions'; 
 import DashboardClient from '@/components/DashboardClient';
 import type { Metadata } from 'next';
 
@@ -11,13 +12,17 @@ type Props = {
   searchParams: Promise<{ tags?: string }>;
 };
 
-// ★1. 動的メタデータの生成（SEO対策の肝）
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+// ★修正1: メタデータ生成でも searchParams (タグ) を受け取る
+export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
   const { cityName } = await params;
+  const { tags } = await searchParams; // ★ここでタグを取得
+  
   const decodedName = decodeURIComponent(cityName);
+  const tagList = tags ? tags.split(',') : []; // ★タグリストを作成
 
-  // データを取得（cacheしてるのでAPI消費は1回分で済みます）
-  const data = await fetchLocationData(decodedName);
+  // ★修正2: getLocationDataに tagList も渡す
+  // これでページ本体の呼び出しと引数が完全に一致し、キャッシュが効く（APIリクエストが1回になる）
+  const data = await getLocationData(decodedName, tagList);
 
   return {
     title: `${decodedName}の観光・歴史・経済データ | MachiLogue`,
@@ -27,7 +32,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description: data.subtitle,
       images: [
         {
-          url: data.headerImageUrl, // その都市の画像をSNSで表示
+          url: data.headerImageUrl, 
           width: 1200,
           height: 630,
           alt: decodedName,
@@ -44,11 +49,10 @@ export default async function CityPage({ params, searchParams }: Props) {
   const decodedName = decodeURIComponent(cityName);
   const tagList = tags ? tags.split(',') : [];
 
-  // データ取得
-  const data = await fetchLocationData(decodedName, tagList);
+  // ここは変更なし（メタデータ側と同じ引数なので、キャッシュされた結果が即座に返り、APIは呼ばれない）
+  const data = await getLocationData(decodedName, tagList);
 
-  // ★2. 構造化データ（JSON-LD）の作成
-  // Googleに「ここは観光地ですよ」と伝えるデータ
+  // 構造化データ（JSON-LD）の作成
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'TouristDestination',
@@ -57,7 +61,7 @@ export default async function CityPage({ params, searchParams }: Props) {
     image: data.headerImageUrl,
     address: {
       '@type': 'PostalAddress',
-      addressCountry: data.tourismInfo.regionalCenter, // 国や地域名として使用
+      addressCountry: data.tourismInfo.regionalCenter,
     },
     geo: {
       '@type': 'GeoCoordinates',
@@ -68,7 +72,6 @@ export default async function CityPage({ params, searchParams }: Props) {
 
   return (
     <>
-      {/* 構造化データを埋め込むスクリプト */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

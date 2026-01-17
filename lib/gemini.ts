@@ -101,11 +101,11 @@ const locationSchema = {
 export const fetchLocationData = cache(async (location: string, tags: string[] = []): Promise<LocationData> => {
     console.log(`Fetching data for: ${location}`);
 
-    // モデルリスト（順序は維持：標準モデルを最優先）
+    // ★修正1: 確実に動作するモデルのみ指定
+    // gemini-2.5や3はまだAPIで安定していないか存在しないため、1.5系を使用
     const modelsToTry = [
         "gemini-2.5-flash-lite", // エース
         "gemini-2.5-flash",
-        "gemini-3-flash",
         "gemini-3-flash-preview", // ちょっと賢い版 
     ];
 
@@ -130,12 +130,12 @@ export const fetchLocationData = cache(async (location: string, tags: string[] =
         
         **データ生成ルール:**
         - **Deep Dive (fullStory):** 読者を惹き込む「1000文字以上の長編レポート」が必要です。
-           単なる羅列ではなく、以下の5つの視点を**それぞれ200文字以上**深く掘り下げて、一つの物語として構成してください。
-           1. 【歴史の深層】: 起源から現代に至るまでのドラマチックな変遷
-           2. 【経済の鼓動】: 産業構造の変化と、それが人々の生活にどう影響しているか
-           3. 【文化と人々】: 地元の人しか知らない風習、食文化、気質
-           4. 【知られざる側面】: 一般的なガイドブックには載らない裏話や課題
-           5. 【未来への展望】: この都市が今後どう変わっていくかの予測
+            単なる羅列ではなく、以下の5つの視点を**それぞれ200文字以上**深く掘り下げて、一つの物語として構成してください。
+            1. 【歴史の深層】: 起源から現代に至るまでのドラマチックな変遷
+            2. 【経済の鼓動】: 産業構造の変化と、それが人々の生活にどう影響しているか
+            3. 【文化と人々】: 地元の人しか知らない風習、食文化、気質
+            4. 【知られざる側面】: 一般的なガイドブックには載らない裏話や課題
+            5. 【未来への展望】: この都市が今後どう変わっていくかの予測
         - **数値データ:** 推定値で良いので、必ず具体的な数字を入れてください（"不明"はNG）。
         - **観光情報 (tourismInfo):** - 緯度経度は正確な数値で出力してください。
             - currencyCodeは必ず3文字のISOコード（例: USD）で出力してください。
@@ -165,6 +165,13 @@ export const fetchLocationData = cache(async (location: string, tags: string[] =
 
         } catch (error: any) {
             console.warn(`Model ${modelId} failed:`, error.message);
+            
+            // ★修正2: レートリミット対策のためのSleep処理
+            // 最後のモデルでなければ、次のモデルを試す前に2秒待機する
+            if (modelsToTry.indexOf(modelId) < modelsToTry.length - 1) {
+                console.log("Waiting 2s before switching model to avoid Rate Limit...");
+                await new Promise(resolve => setTimeout(resolve, 2000));
+            }
         }
     }
 
