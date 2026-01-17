@@ -1,8 +1,7 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import dynamic from 'next/dynamic';
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import Header from './Header';
@@ -30,6 +29,9 @@ const DashboardClient: React.FC<Props> = ({ initialData, selectedTags }) => {
     const router = useRouter();
     const [activeTab, setActiveTab] = useState<Tab>('tourism');
     const [isDarkMode, setIsDarkMode] = useState(false);
+    
+    // ★重要: スクロール位置の基準となる「動かない目印」のref
+    const scrollRef = useRef<HTMLDivElement>(null);
 
     // ダークモードの制御
     useEffect(() => {
@@ -44,10 +46,26 @@ const DashboardClient: React.FC<Props> = ({ initialData, selectedTags }) => {
         else root.classList.remove('dark');
     }, [isDarkMode]);
 
-    // ★追加: タブが切り替わったらページ上部にスクロール
-    useEffect(() => {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-    }, [activeTab]);
+    // タブ変更とスクロールをセットで行う関数
+    const handleTabChange = (tab: Tab) => {
+        setActiveTab(tab);
+
+        // 「目印」の位置を基準にスクロール
+        if (scrollRef.current) {
+            const headerHeight = 64; // ヘッダーの高さ (h-16 = 64px)
+            
+            // 目印の絶対位置を計算 (現在のスクロール量 + 画面内の位置)
+            const elementPosition = scrollRef.current.getBoundingClientRect().top + window.scrollY;
+            
+            // ヘッダーの高さ分だけずらす
+            const offsetPosition = elementPosition - headerHeight;
+
+            window.scrollTo({
+                top: offsetPosition,
+                behavior: 'smooth'
+            });
+        }
+    };
 
     const renderContent = () => {
         switch (activeTab) {
@@ -87,7 +105,15 @@ const DashboardClient: React.FC<Props> = ({ initialData, selectedTags }) => {
                     tags={initialData.tags}
                     headerImageUrl={initialData.headerImageUrl}
                 />
-                <Tabs activeTab={activeTab} setActiveTab={setActiveTab} />
+                
+                {/* ★ここに「動かない目印」を設置 */}
+                {/* sticky要素の計算ズレを防ぐための絶対的な基準点です */}
+                <div ref={scrollRef} className="scroll-mt-16" />
+
+                <div className="sticky top-16 z-40 bg-background-light dark:bg-background-dark transition-colors duration-300 shadow-sm">
+                    <Tabs activeTab={activeTab} setActiveTab={handleTabChange} />
+                </div>
+
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
                     {renderContent()}
                 </div>

@@ -1,5 +1,6 @@
 'use client';
 import React, { useState } from 'react';
+import Link from 'next/link'; // Linkコンポーネントをimport
 import Icon from './Icon';
 import type { SearchTag } from '../types';
 
@@ -36,7 +37,6 @@ const LandingPage: React.FC<LandingPageProps> = ({ onSearch }) => {
             {/* ヘッダー部分 */}
             <div className="text-center mb-10">
                 <div className="flex items-center justify-center gap-3 font-bold tracking-tight text-primary">
-                    {/* スマホで4xl(36px)、PCで5xl(48px) になるようレスポンシブ調整 */}
                     <Icon name="public" className="!text-4xl md:!text-5xl" />
                     <h1 className="text-4xl md:text-5xl">MachiLogue</h1>
                 </div>
@@ -88,18 +88,31 @@ const LandingPage: React.FC<LandingPageProps> = ({ onSearch }) => {
             </form>
 
             {/* おすすめキーワード */}
-            <div className="mt-12 text-center">
-                <p className="text-slate-500 dark:text-slate-400 mb-4 text-sm font-medium">または、人気の都市やランドマークから:</p>
-                <div className="flex flex-wrap gap-3 justify-center">
-                    {suggestions.map(city => (
-                        <button
-                            key={city}
-                            onClick={() => onSearch(city, selectedTags)}
-                            className="px-5 py-2.5 bg-white/80 dark:bg-surface-dark/80 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-white dark:hover:bg-surface-dark hover:border-primary/50 hover:shadow-md transition-all duration-200 font-medium text-slate-700 dark:text-slate-200"
-                        >
-                            {city}
-                        </button>
-                    ))}
+            <div className="mt-12 text-center space-y-10">
+                <div>
+                    <p className="text-slate-500 dark:text-slate-400 mb-4 text-sm font-medium">または、人気の都市やランドマークから:</p>
+                    <div className="flex flex-wrap gap-3 justify-center">
+                        {suggestions.map(city => (
+                            <button
+                                key={city}
+                                onClick={() => onSearch(city, selectedTags)}
+                                className="px-5 py-2.5 bg-white/80 dark:bg-surface-dark/80 border border-gray-200 dark:border-gray-700 rounded-xl hover:bg-white dark:hover:bg-surface-dark hover:border-primary/50 hover:shadow-md transition-all duration-200 font-medium text-slate-700 dark:text-slate-200"
+                            >
+                                {city}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                {/* ★追加: MachiLogueとは？へのリンク */}
+                <div>
+                    <Link 
+                        href="/about"
+                        className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-primary transition-colors border-b border-transparent hover:border-primary pb-0.5"
+                    >
+                        <Icon name="info" className="text-base" />
+                        MachiLogueとは？
+                    </Link>
                 </div>
             </div>
         </div>
