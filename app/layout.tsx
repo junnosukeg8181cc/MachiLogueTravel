@@ -7,8 +7,24 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const lora = Lora({ subsets: ["latin"], variable: "--font-lora", style: ["normal", "italic"] });
 
 export const metadata: Metadata = {
+  // ★ここを新しいURLに書き換え！
+  metadataBase: new URL('https://machi-logue-travel.vercel.app'),
+  
   title: "MachiLogue - 世界の都市をデータで探求する",
   description: "観光、歴史、経済データをAIが可視化するトラベルダッシュボード",
+  openGraph: {
+    title: "MachiLogue - データで旅するAIガイド",
+    description: "世界の都市を「観光」「経済」「歴史」のデータから多角的に分析。",
+    url: 'https://machi-logue-travel.vercel.app',
+    siteName: 'MachiLogue',
+    locale: 'ja_JP',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: "MachiLogue - データで旅するAIガイド",
+    description: "世界の都市をデータで可視化するトラベルダッシュボード",
+  },
 };
 
 export default function RootLayout({
