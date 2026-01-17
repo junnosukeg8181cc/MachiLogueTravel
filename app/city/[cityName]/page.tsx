@@ -1,71 +1,78 @@
-import type { Metadata } from 'next';
-import { getLocationData } from '@/lib/actions';
+import React from 'react';
+import { fetchLocationData } from '@/lib/gemini';
 import DashboardClient from '@/components/DashboardClient';
+import type { Metadata } from 'next';
 
-// Next.js 15以降を見据えた型定義（paramsはPromiseになる可能性があります）
+// ページのPropsの型定義
 type Props = {
   params: Promise<{ cityName: string }>;
-  searchParams: Promise<{ [key: string]: string | string[] | undefined }>;
+  searchParams: Promise<{ tags?: string }>;
 };
 
-// 1. 動的メタデータ生成 (SEO対策の要！)
-// ページの中身を作る前に、Google検索結果に表示されるタイトルや説明文を自動で作ります。
-export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
+// ★1. 動的メタデータの生成（SEO対策の肝）
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { cityName } = await params;
-  const decodedCityName = decodeURIComponent(cityName);
-  
+  const decodedName = decodeURIComponent(cityName);
+
+  // データを取得（cacheしてるのでAPI消費は1回分で済みます）
+  const data = await fetchLocationData(decodedName);
+
   return {
-    title: `${decodedCityName}の観光・歴史・経済完全ガイド | MachiLogue`,
-    description: `AIが分析した${decodedCityName}の旅行ガイド。観光スポット、経済状況、歴史的な背景まで、あらゆるデータを可視化して提供します。`,
+    title: `${decodedName}の観光・歴史・経済データ | MachiLogue`,
+    description: data.subtitle || `${decodedName}の詳細な観光ガイド。歴史、経済、旅行プランをAIが分析。`,
     openGraph: {
-      title: `${decodedCityName}の全てをデータで可視化 - MachiLogue`,
-      description: `${decodedCityName}への旅行前に知っておくべき情報を網羅。`,
+      title: `${decodedName} - MachiLogue`,
+      description: data.subtitle,
+      images: [
+        {
+          url: data.headerImageUrl, // その都市の画像をSNSで表示
+          width: 1200,
+          height: 630,
+          alt: decodedName,
+        },
+      ],
     },
   };
 }
 
-// 2. ページ本体 (Server Component)
-// ここはサーバー（Node.js）で実行されます。
 export default async function CityPage({ params, searchParams }: Props) {
-  // URLから都市名とタグを取得
   const { cityName } = await params;
   const { tags } = await searchParams;
   
-  const decodedCityName = decodeURIComponent(cityName);
-  // タグがカンマ区切りで来るので配列に戻す。これが「選択されたタグ」です。
-  const tagList = typeof tags === 'string' ? tags.split(',').filter(Boolean) : [];
+  const decodedName = decodeURIComponent(cityName);
+  const tagList = tags ? tags.split(',') : [];
 
-  // ★ここでサーバー側でデータを取得！ (ユーザーのブラウザは待機中)
-  // loading.tsxを作れば、この待機中にローディング画面が出せます
-  const locationData = await getLocationData(decodedCityName, tagList);
+  // データ取得
+  const data = await fetchLocationData(decodedName, tagList);
 
-  // 構造化データ（JSON-LD）を作成
-  // Googleに「これは記事ではなく、観光地のデータですよ」と教える最強のSEO対策
+  // ★2. 構造化データ（JSON-LD）の作成
+  // Googleに「ここは観光地ですよ」と伝えるデータ
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'TouristDestination',
-    name: locationData.locationName,
-    description: locationData.subtitle,
-    image: locationData.headerImageUrl,
-    publicAccess: true,
+    name: data.locationName,
+    description: data.subtitle,
+    image: data.headerImageUrl,
+    address: {
+      '@type': 'PostalAddress',
+      addressCountry: data.tourismInfo.regionalCenter, // 国や地域名として使用
+    },
     geo: {
       '@type': 'GeoCoordinates',
-      latitude: locationData.tourismInfo.latitude,
-      longitude: locationData.tourismInfo.longitude,
-    }
+      latitude: data.tourismInfo.latitude,
+      longitude: data.tourismInfo.longitude,
+    },
   };
 
   return (
     <>
-      {/* 構造化データを埋め込む */}
+      {/* 構造化データを埋め込むスクリプト */}
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       
-      {/* データをクライアントコンポーネントに渡して表示 */}
-      {/* selectedTags として URL から取得したタグリストを渡します */}
-      <DashboardClient initialData={locationData} selectedTags={tagList} />
+      <DashboardClient initialData={data} selectedTags={tagList} />
     </>
   );
 }

@@ -1,5 +1,7 @@
 import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
 import { LocationData } from "@/types"; // さっき作った型定義を読み込み
+// ★追加: Reactのcache機能をインポート
+import { cache } from 'react';
 
 // サーバー側の環境変数からキーを取得
 const apiKey = process.env.GEMINI_API_KEY;
@@ -24,7 +26,7 @@ const fetchImageFromUnsplash = async (query: string): Promise<string> => {
     }
 };
 
-// スキーマ定義（ここは元のコードと同じやけど、長いから省略せずに書くで）
+// スキーマ定義
 const locationSchema = {
     description: "Location data schema",
     type: SchemaType.OBJECT,
@@ -96,10 +98,12 @@ const locationSchema = {
     required: ["locationName", "englishLocationName", "subtitle", "tags", "economicSnapshot", "majorIndustries", "historicalTimeline", "travelPlan", "deepDive", "tourismInfo"],
 };
 
-export const fetchLocationData = async (location: string, tags: string[] = []): Promise<LocationData> => {
+// ★修正: 関数全体を cache() でラップしました
+export const fetchLocationData = cache(async (location: string, tags: string[] = []): Promise<LocationData> => {
     // サーバーサイドなのでconsole.logはサーバーのターミナルに出ます
     console.log(`Fetching data for: ${location}`);
 
+    // ★指定通り、モデル名は変更していません
     const modelsToTry = [
         "gemini-2.5-flash-lite", // エース
         "gemini-2.5-flash",
@@ -148,4 +152,4 @@ export const fetchLocationData = async (location: string, tags: string[] = []): 
     }
 
     throw new Error("データの取得に失敗しました。");
-};
+});
