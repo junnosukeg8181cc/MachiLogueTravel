@@ -12,6 +12,9 @@ export const metadata: Metadata = {
   
   title: "MachiLogue - 世界の都市をデータで探求する",
   description: "観光、歴史、経済データをAIが可視化するトラベルダッシュボード",
+  verification: {
+    google: 'EwekBe2YOZRPisPcGPqlydeRYZWnMUb7bP9s1htLzdc',
+  },
   openGraph: {
     title: "MachiLogue - データで旅するAIガイド",
     description: "世界の都市を「観光」「経済」「歴史」のデータから多角的に分析。",
