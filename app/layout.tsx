@@ -1,20 +1,24 @@
 import type { Metadata } from "next";
 import { Inter, Lora } from "next/font/google";
-import "./globals.css"; // ← ★この行が絶対に必要です！
+import { GoogleAnalytics } from '@next/third-parties/google'; // ★追加
+import "./globals.css";
 import "leaflet/dist/leaflet.css";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const lora = Lora({ subsets: ["latin"], variable: "--font-lora", style: ["normal", "italic"] });
 
 export const metadata: Metadata = {
-  // ★ここを新しいURLに書き換え！
+  // サイトのベースURL設定
   metadataBase: new URL('https://machi-logue-travel.vercel.app'),
   
   title: "MachiLogue - 世界の都市をデータで探求する",
   description: "観光、歴史、経済データをAIが可視化するトラベルダッシュボード",
+  
+  // Search Consoleの所有権確認コード
   verification: {
     google: 'EwekBe2YOZRPisPcGPqlydeRYZWnMUb7bP9s1htLzdc',
   },
+
   openGraph: {
     title: "MachiLogue - データで旅するAIガイド",
     description: "世界の都市を「観光」「経済」「歴史」のデータから多角的に分析。",
@@ -43,6 +47,8 @@ export default function RootLayout({
       </head>
       <body className="bg-gray-50 dark:bg-slate-900 font-sans text-slate-800 dark:text-slate-100 transition-colors duration-300">
         {children}
+        {/* ★Google Analyticsの埋め込み。IDは環境変数から取得します */}
+        <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID || ""} />
       </body>
     </html>
   );
