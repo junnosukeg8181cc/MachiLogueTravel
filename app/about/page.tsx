@@ -45,7 +45,7 @@ export default function AboutPage() {
           <FeatureCard 
             icon="analytics"
             title="都市の「今」を数値化"
-            description="GDP、物価指数、治安、産業構造。ガイドブックには載らないリアルな経済データを可視化し、その街の本当の姿を浮き彫りにします。"
+            description="GDP、物価指数、為替、産業構造。ガイドブックには載らないリアルな経済データを可視化し、その街の本当の姿を浮き彫りにします。"
           />
           <FeatureCard 
             icon="history_edu"
