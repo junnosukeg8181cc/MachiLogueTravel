@@ -101,9 +101,8 @@ const locationSchema = {
 export const fetchLocationData = cache(async (location: string, tags: string[] = []): Promise<LocationData> => {
     console.log(`Fetching data for: ${location}`);
 
-    // ★修正ポイント: ループ廃止＆安定版モデル(1.5-flash)に固定
     // これにより、1回のリクエスト失敗で即座にエラーを返し、API制限(429)の連鎖を防ぐ
-    const modelId = "gemini-2.5-flash";
+    const modelId = "gemini-2.5-flash-lite";
 
     // タグがある場合の詳細指示
     const tagsInstruction = tags.length > 0 
