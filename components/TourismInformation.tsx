@@ -90,9 +90,10 @@ const TourismInformation: React.FC<TourismInformationProps> = ({
         <section className="space-y-10">
             {/* 1. 観光サマリと地図 */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                {/* 概要テキスト */}
+                
+                {/* 概要テキスト（orderクラスを削除：これでスマホでは上に来る） */}
                 {tourismSummary && (
-                    <div className="flex flex-col order-2 lg:order-1">
+                    <div className="flex flex-col">
                         <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-4 flex items-center gap-2">
                             <Icon name="explore" className="text-primary" />
                             概要
@@ -104,8 +105,9 @@ const TourismInformation: React.FC<TourismInformationProps> = ({
                         </InfoCard>
                     </div>
                 )}
-                {/* 地図 */}
-                <div className="flex flex-col order-1 lg:order-2">
+
+                {/* 地図（orderクラスを削除：これでスマホでは下に来る） */}
+                <div className="flex flex-col">
                      <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-4 flex items-center gap-2">
                         <Icon name="map" className="text-primary" />
                         地図
@@ -125,7 +127,7 @@ const TourismInformation: React.FC<TourismInformationProps> = ({
                 <WeatherForecast latitude={latitude} longitude={longitude} />
             </div>
 
-            {/* 3. 基本情報 & マネー（レイアウト変更：上下構成） */}
+            {/* 3. 基本情報 & マネー */}
             <div>
                 <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-4 flex items-center gap-2">
                     <Icon name="info" className="text-primary" />
@@ -133,7 +135,7 @@ const TourismInformation: React.FC<TourismInformationProps> = ({
                 </h3>
                 
                 <div className="space-y-4">
-                    {/* 上段：中心都市と言語（横並び） */}
+                    {/* 上段：中心都市と言語 */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <InfoCard>
                             <InfoItem 
@@ -153,14 +155,14 @@ const TourismInformation: React.FC<TourismInformationProps> = ({
                         </InfoCard>
                     </div>
 
-                    {/* 下段：決済情報の統合カード（横長フルサイズ） */}
+                    {/* 下段：決済情報の統合カード */}
                     <InfoCard className="bg-gradient-to-br from-white to-slate-50 dark:from-surface-dark dark:to-slate-800/50 relative overflow-hidden">
                          {/* 背景の装飾アイコン */}
                         <Icon name="payments" className="absolute -bottom-10 -right-4 text-[10rem] text-primary/5 dark:text-primary/10 pointer-events-none" />
 
                         <div className="relative z-10 flex flex-col md:flex-row md:items-center gap-6 p-2">
                             
-                            {/* 左側：通貨情報（メイン） */}
+                            {/* 左側：通貨情報 */}
                             <div className="flex items-start gap-4 md:w-1/3">
                                 <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 dark:bg-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 flex-shrink-0">
                                     <Icon name="currency_exchange" className="text-3xl" />
@@ -174,11 +176,11 @@ const TourismInformation: React.FC<TourismInformationProps> = ({
                                 </div>
                             </div>
 
-                            {/* 仕切り線（PCは縦、スマホは横） */}
+                            {/* 仕切り線 */}
                             <div className="hidden md:block w-px h-16 bg-gray-200 dark:bg-gray-700/50 mx-2" />
                             <hr className="md:hidden border-gray-100 dark:border-gray-700/50" />
 
-                            {/* 右側：決済事情とチップ（データ詳細） */}
+                            {/* 右側：決済事情とチップ */}
                             <div className="flex-1">
                                 {payment ? (
                                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">

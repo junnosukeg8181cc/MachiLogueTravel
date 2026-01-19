@@ -1,8 +1,8 @@
 import React from 'react';
+// Supabase処理が入ったactionsから呼ぶ
 import { getLocationData } from '@/lib/actions'; 
 import DashboardClient from '@/components/DashboardClient';
 import type { Metadata } from 'next';
-// ★修正: ここでの import PaymentInfo ... は削除したで（使わんからな）
 
 // 念のため60秒にしておく
 export const maxDuration = 60;
@@ -13,7 +13,7 @@ type Props = {
   searchParams: Promise<{ tags?: string }>;
 };
 
-// ★準備: 5枚のデフォルト画像リスト
+// 5枚のデフォルト画像リスト
 const OG_IMAGES = [
   '/og-1.jpg',
   '/og-2.jpg',
@@ -27,7 +27,7 @@ const OG_IMAGES = [
   '/og-10.jpg',
 ];
 
-// ★修正: AIを待たず、都市名に基づいて画像を割り当てる「爆速メタデータ」
+// AIを待たず、都市名に基づいて画像を割り当てる「爆速メタデータ」
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { cityName } = await params;
   const decodedName = decodeURIComponent(cityName);
@@ -38,10 +38,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   return {
     title: `${decodedName}の観光・歴史・経済データ | MachiLogue`,
-    description: `${decodedName}の詳細な観光ガイド。歴史、経済、旅行プランをAIが分析中...`,
+    // ★ここを修正：「旅行プラン」を削って「観光地概要」にフォーカス
+    description: `${decodedName}の観光地概要と詳細データ。歴史、経済、文化をAIが多角的に分析したトラベルダッシュボード。`,
     openGraph: {
       title: `${decodedName} - MachiLogue`,
-      description: `${decodedName}の詳細データを確認する`,
+      // ★ここも同じく修正
+      description: `${decodedName}の観光地概要と詳細データを確認する`,
       images: [
         {
           url: selectedImage,
@@ -61,10 +63,8 @@ export default async function CityPage({ params, searchParams }: Props) {
   const decodedName = decodeURIComponent(cityName);
   const tagList = tags ? tags.split(',') : [];
 
-  // ★ここでデータ取得（payment情報も含まれてる）
   const data = await getLocationData(decodedName, tagList);
 
-  // 構造化データ（JSON-LD）の作成
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'TouristDestination',
