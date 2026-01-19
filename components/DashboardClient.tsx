@@ -10,7 +10,7 @@ import Tabs from './Tabs';
 import HistoryPage from './HistoryPage';
 import PlanPage from './PlanPage';
 import TourismInformation from './TourismInformation';
-// ★修正1: Tab型もここからインポート（重複定義を避けるため）
+// Tab型もここからインポート
 import type { LocationData, Tab } from '@/types';
 
 // 地図コンポーネントを動的にインポート（SSR回避）
@@ -18,8 +18,6 @@ const CityMap = dynamic(() => import('./CityMap'), {
   ssr: false,
   loading: () => <div className="h-[400px] bg-gray-100 animate-pulse rounded-2xl" />
 });
-
-// ★修正2: ここにあった `type Tab = ...` は削除しました
 
 interface Props {
   initialData: LocationData;
@@ -31,7 +29,7 @@ const DashboardClient: React.FC<Props> = ({ initialData, selectedTags }) => {
     const [activeTab, setActiveTab] = useState<Tab>('tourism');
     const [isDarkMode, setIsDarkMode] = useState(false);
     
-    // ★重要: スクロール位置の基準となる「動かない目印」のref
+    // スクロール位置の基準となる「動かない目印」のref
     const scrollRef = useRef<HTMLDivElement>(null);
 
     // ダークモードの制御
@@ -55,10 +53,8 @@ const DashboardClient: React.FC<Props> = ({ initialData, selectedTags }) => {
         if (scrollRef.current) {
             const headerHeight = 64; // ヘッダーの高さ (h-16 = 64px)
             
-            // 目印の絶対位置を計算 (現在のスクロール量 + 画面内の位置)
+            // 目印の絶対位置を計算
             const elementPosition = scrollRef.current.getBoundingClientRect().top + window.scrollY;
-            
-            // ヘッダーの高さ分だけずらす
             const offsetPosition = elementPosition - headerHeight;
 
             window.scrollTo({
@@ -78,6 +74,8 @@ const DashboardClient: React.FC<Props> = ({ initialData, selectedTags }) => {
                             locationName={initialData.locationName} 
                             industries={initialData.majorIndustries}
                             economicSnapshot={initialData.economicSnapshot}
+                            // ★ここ修正: 決済情報を渡す！
+                            payment={initialData.payment}
                         />
                     </div>
                 );
@@ -105,12 +103,10 @@ const DashboardClient: React.FC<Props> = ({ initialData, selectedTags }) => {
                     subtitle={initialData.subtitle}
                     tags={initialData.tags}
                     headerImageUrl={initialData.headerImageUrl}
-                    // ★修正3: SNSシェア用に旅程データを渡す
                     travelPlan={initialData.travelPlan}
                 />
                 
-                {/* ★ここに「動かない目印」を設置 */}
-                {/* sticky要素の計算ズレを防ぐための絶対的な基準点です */}
+                {/* スクロール位置の基準点 */}
                 <div ref={scrollRef} className="scroll-mt-16" />
 
                 <div className="sticky top-16 z-40 bg-background-light dark:bg-background-dark transition-colors duration-300 shadow-sm">

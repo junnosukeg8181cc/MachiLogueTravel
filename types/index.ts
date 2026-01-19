@@ -87,3 +87,16 @@ export interface LocationData {
   deepDive: DeepDive;
   tourismInfo: TourismInfo;
 }
+
+export interface PaymentInfo {
+  currency: string;        // 通貨 (例: ユーロ、ドル)
+  cashInfo: string;        // 現金の必要性 (例: 屋台では必須、ほぼ不要など)
+  cardInfo: string;        // カード事情 (例: VISA/MasterはどこでもOKなど)
+  tipping: string;         // チップ文化 (例: 義務、気持ち程度、なし)
+  tippingRate: string;     // チップ相場 (例: 15-20%、端数を切り上げ)
+}
+
+export interface CityData {
+  // ...既存のプロパティ
+  payment: PaymentInfo; // ★ここを追加
+}

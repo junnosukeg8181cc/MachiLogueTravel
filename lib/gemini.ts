@@ -92,9 +92,22 @@ const locationSchema = {
                 tourismInfo: { type: SchemaType.STRING }
             },
             required: ["latitude", "longitude", "regionalCenter", "distanceFromCenter", "language", "currency", "currencyCode", "currencyRate", "area", "tourismInfo"]
+        },
+        // ★追加: 決済情報のスキーマ定義
+        payment: {
+            type: SchemaType.OBJECT,
+            properties: {
+                currency: { type: SchemaType.STRING, description: "Currency name (e.g. Euro)" },
+                cashInfo: { type: SchemaType.STRING, description: "Short summary of cash necessity (e.g. 'Necessary for small shops')" },
+                cardInfo: { type: SchemaType.STRING, description: "Short summary of card acceptance (e.g. 'Visa/Master widely accepted')" },
+                tipping: { type: SchemaType.STRING, description: "Short summary of tipping culture" },
+                tippingRate: { type: SchemaType.STRING, description: "e.g. '10-15%', 'Round up'" }
+            },
+            required: ["currency", "cashInfo", "cardInfo", "tipping", "tippingRate"]
         }
     },
-    required: ["locationName", "englishLocationName", "subtitle", "tags", "economicSnapshot", "majorIndustries", "historicalTimeline", "travelPlan", "deepDive", "tourismInfo"],
+    // ★追加: paymentを必須項目に追加
+    required: ["locationName", "englishLocationName", "subtitle", "tags", "economicSnapshot", "majorIndustries", "historicalTimeline", "travelPlan", "deepDive", "tourismInfo", "payment"],
 };
 
 // 関数全体を cache() でラップ
@@ -112,7 +125,7 @@ export const fetchLocationData = cache(async (location: string, tags: string[] =
     // プロンプト定義
     const prompt = `
         Role: 世界のトップトラベルジャーナリスト兼経済アナリスト。
-        Objective: 「${location}」の観光・経済・歴史データを生成する。
+        Objective: 「${location}」の観光・経済・歴史・決済事情データを生成する。
 
         ${tagsInstruction}
 
@@ -135,6 +148,13 @@ export const fetchLocationData = cache(async (location: string, tags: string[] =
         - **観光情報 (tourismInfo):** - 緯度経度は正確な数値で出力してください。
             - currencyCodeは必ず3文字のISOコード（例: USD）で出力してください。
             - 観光情報サマリは日本語で300文字程度で記述してください。
+        
+        - **決済・お金事情 (payment): ★追加項目**
+            - currency: 現地通貨名
+            - cashInfo: 現金の必要性（例：「屋台や地方では必須」「ほぼ完全キャッシュレス」など簡潔に）
+            - cardInfo: クレジットカード事情（例：「VISA/Masterはどこでも使える」「JCBは一部のみ」など）
+            - tipping: チップ文化の有無（例：「義務」「気持ち程度」「不要」）
+            - tippingRate: チップの相場（例：「会計の10-15%」「端数を切り上げる程度」）
     `;
 
     try {

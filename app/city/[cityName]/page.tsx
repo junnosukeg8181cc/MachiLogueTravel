@@ -1,8 +1,8 @@
 import React from 'react';
-// Supabase処理が入ったactionsから呼ぶ
 import { getLocationData } from '@/lib/actions'; 
 import DashboardClient from '@/components/DashboardClient';
 import type { Metadata } from 'next';
+// ★修正: ここでの import PaymentInfo ... は削除したで（使わんからな）
 
 // 念のため60秒にしておく
 export const maxDuration = 60;
@@ -14,7 +14,6 @@ type Props = {
 };
 
 // ★準備: 5枚のデフォルト画像リスト
-// publicフォルダに og-1.jpg, og-2.jpg ... を置いておくこと
 const OG_IMAGES = [
   '/og-1.jpg',
   '/og-2.jpg',
@@ -33,8 +32,6 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { cityName } = await params;
   const decodedName = decodeURIComponent(cityName);
 
-  // ★ロジック: 文字列（都市名）を数値に変換して、5で割った余りを計算する
-  // これにより、ランダムに見えて「その都市では常に同じ画像」が選ばれる（SNSで安定する）
   const nameScore = decodedName.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
   const imageIndex = nameScore % OG_IMAGES.length;
   const selectedImage = OG_IMAGES[imageIndex];
@@ -47,7 +44,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       description: `${decodedName}の詳細データを確認する`,
       images: [
         {
-          url: selectedImage, // 計算で選ばれた画像
+          url: selectedImage,
           width: 1200,
           height: 630,
           alt: `${decodedName} - MachiLogue`,
@@ -64,7 +61,7 @@ export default async function CityPage({ params, searchParams }: Props) {
   const decodedName = decodeURIComponent(cityName);
   const tagList = tags ? tags.split(',') : [];
 
-  // ★ここで初めて重い処理 (AI生成 or DB取得) が走る
+  // ★ここでデータ取得（payment情報も含まれてる）
   const data = await getLocationData(decodedName, tagList);
 
   // 構造化データ（JSON-LD）の作成
