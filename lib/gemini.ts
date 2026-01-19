@@ -138,7 +138,6 @@ export const fetchLocationData = cache(async (location: string, tags: string[] =
     `;
 
     try {
-        // モデルのインスタンス化
         const model = genAI.getGenerativeModel({
             model: modelId,
             generationConfig: {
@@ -147,21 +146,25 @@ export const fetchLocationData = cache(async (location: string, tags: string[] =
             }
         });
 
-        // データ生成実行（リトライなしの一発勝負）
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
+        // ★修正2: Unsplash検索とGemini生成を「並列」に実行して時間を節約
+        // 画像検索には入力された location (例: "台北") をそのまま使うことで、Geminiの結果を待たずに検索開始できる
+        const [geminiResult, headerImageUrl] = await Promise.all([
+            model.generateContent(prompt),
+            fetchImageFromUnsplash(location) // Unsplashは日本語検索も対応してるのでこれでOK
+        ]);
+
+        const response = await geminiResult.response;
         const jsonText = response.text();
         
         if (!jsonText) throw new Error("Empty response");
         
         const data = JSON.parse(jsonText);
-        const imageUrl = await fetchImageFromUnsplash(data.englishLocationName || location);
 
-        return { ...data, headerImageUrl: imageUrl } as LocationData;
+        // 並列取得した画像をデータにマージ
+        return { ...data, headerImageUrl } as LocationData;
 
     } catch (error: any) {
         console.error(`Gemini API Error (${modelId}):`, error.message);
-        // レートリミット等のエラーが出た場合は、リトライせずにエラーを投げる
         throw new Error("API制限またはエラーによりデータの取得に失敗しました。しばらく時間を置いてから再試行してください。");
     }
 });

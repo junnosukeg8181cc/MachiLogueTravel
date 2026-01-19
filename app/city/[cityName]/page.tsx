@@ -4,7 +4,7 @@ import { getLocationData } from '@/lib/actions';
 import DashboardClient from '@/components/DashboardClient';
 import type { Metadata } from 'next';
 
-export const maxDuration = 30;
+export const maxDuration = 60;
 
 // ページのPropsの型定義
 type Props = {
@@ -15,30 +15,14 @@ type Props = {
 // ★修正1: メタデータ生成でも searchParams (タグ) を受け取る
 export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
   const { cityName } = await params;
-  const { tags } = await searchParams; // ★ここでタグを取得
-  
   const decodedName = decodeURIComponent(cityName);
-  const tagList = tags ? tags.split(',') : []; // ★タグリストを作成
 
-  // ★修正2: getLocationDataに tagList も渡す
-  // これでページ本体の呼び出しと引数が完全に一致し、キャッシュが効く（APIリクエストが1回になる）
-  const data = await getLocationData(decodedName, tagList);
-
+  // ★重要: メタデータ生成時は重い処理 (getLocationData) を呼ばない
+  // 初回アクセス時はデフォルトの画像や説明文を出し、ページ本体でAI生成結果を表示させるのがUX的にも正解
   return {
     title: `${decodedName}の観光・歴史・経済データ | MachiLogue`,
-    description: data.subtitle || `${decodedName}の詳細な観光ガイド。歴史、経済、旅行プランをAIが分析。`,
-    openGraph: {
-      title: `${decodedName} - MachiLogue`,
-      description: data.subtitle,
-      images: [
-        {
-          url: data.headerImageUrl, 
-          width: 1200,
-          height: 630,
-          alt: decodedName,
-        },
-      ],
-    },
+    description: `${decodedName}の詳細な観光ガイド。AIが分析中...`,
+    // 画像などは一旦なし、またはデフォルト画像にする
   };
 }
 
