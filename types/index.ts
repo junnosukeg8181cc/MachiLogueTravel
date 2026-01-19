@@ -1,6 +1,5 @@
 export type SearchTag = '金融' | 'トレンド' | 'アート' | '民俗' | '交通・インフラ' | 'グルメ' | '人口流体';
 
-// ★これを追加！
 export type Tab = 'tourism' | 'history' | 'plan';
 
 export interface EconomicMetric {
@@ -34,7 +33,7 @@ export interface TimelineEvent {
   title: string;
   description: string;
   icon: string;
-  historicalContext?: string; // オプショナルに変更
+  historicalContext?: string;
 }
 
 export interface DeepDive {
@@ -74,29 +73,27 @@ export interface TourismInfo {
   tourismInfo: string;
 }
 
+// ★追加: 決済情報の型定義
+export interface PaymentInfo {
+  currency: string;     // 通貨名
+  cashInfo: string;     // 現金事情
+  cardInfo: string;     // カード事情
+  tipping: string;      // チップ文化
+  tippingRate: string;  // チップ相場
+}
+
 export interface LocationData {
   locationName: string;
   subtitle: string;
   tags: string[];
   headerImageUrl: string;
-  englishLocationName?: string; // 追加
+  englishLocationName?: string;
   economicSnapshot: EconomicSnapshotData;
   majorIndustries: Industry[];
   historicalTimeline: TimelineEvent[];
   travelPlan: TravelPlan;
   deepDive: DeepDive;
   tourismInfo: TourismInfo;
-}
-
-export interface PaymentInfo {
-  currency: string;        // 通貨 (例: ユーロ、ドル)
-  cashInfo: string;        // 現金の必要性 (例: 屋台では必須、ほぼ不要など)
-  cardInfo: string;        // カード事情 (例: VISA/MasterはどこでもOKなど)
-  tipping: string;         // チップ文化 (例: 義務、気持ち程度、なし)
-  tippingRate: string;     // チップ相場 (例: 15-20%、端数を切り上げ)
-}
-
-export interface CityData {
-  // ...既存のプロパティ
-  payment: PaymentInfo; // ★ここを追加
+  // ★追加: ここに payment を追加しないと認識されへん
+  payment: PaymentInfo;
 }
