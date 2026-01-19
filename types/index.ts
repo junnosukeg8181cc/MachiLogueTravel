@@ -1,17 +1,17 @@
-export type SearchTag = '金融' | 'トレンド' | 'アート' | '民俗' | '交通・インフラ' | 'グルメ' | '人口流体';
+// types/index.ts
 
+export type SearchTag = '金融' | 'トレンド' | 'アート' | '民俗' | '交通・インフラ' | 'グルメ' | '人口流体';
 export type Tab = 'tourism' | 'history' | 'plan';
 
+// ... (既存のEconomicMetricなどの定義はそのまま) ...
 export interface EconomicMetric {
   value: string;
   currency?: string;
   growth?: string;
 }
-
 export interface EconomicMetricSimple {
     value: string;
 }
-
 export interface EconomicSnapshotData {
   year: string;
   dataScope: string;
@@ -21,13 +21,11 @@ export interface EconomicSnapshotData {
   unemploymentRate: EconomicMetricSimple;
   inflationRate: EconomicMetricSimple;
 }
-
 export interface Industry {
   name: string;
   icon: string;
   colorKey: string;
 }
-
 export interface TimelineEvent {
   year: string;
   title: string;
@@ -35,7 +33,6 @@ export interface TimelineEvent {
   icon: string;
   historicalContext?: string;
 }
-
 export interface DeepDive {
     title: string;
     summary: string;
@@ -45,7 +42,6 @@ export interface DeepDive {
         details: string;
     };
 }
-
 export interface ItineraryItem {
   time: string;
   title: string;
@@ -53,13 +49,11 @@ export interface ItineraryItem {
   icon: string;
   historicalContext: string;
 }
-
 export interface TravelPlan {
   title: string;
   description: string;
   itinerary: ItineraryItem[];
 }
-
 export interface TourismInfo {
   latitude: number;
   longitude: number;
@@ -73,13 +67,13 @@ export interface TourismInfo {
   tourismInfo: string;
 }
 
-// ★追加: 決済情報の型定義
+// ★追加1: 決済情報の型定義
 export interface PaymentInfo {
-  currency: string;     // 通貨名
-  cashInfo: string;     // 現金事情
-  cardInfo: string;     // カード事情
-  tipping: string;      // チップ文化
-  tippingRate: string;  // チップ相場
+  currency: string;
+  cashInfo: string;
+  cardInfo: string;
+  tipping: string;
+  tippingRate: string;
 }
 
 export interface LocationData {
@@ -94,6 +88,6 @@ export interface LocationData {
   travelPlan: TravelPlan;
   deepDive: DeepDive;
   tourismInfo: TourismInfo;
-  // ★追加: ここに payment を追加しないと認識されへん
+  // ★追加2: ここに payment を追加！
   payment: PaymentInfo;
 }

@@ -1,3 +1,4 @@
+// lib/gemini.ts
 import { GoogleGenerativeAI, SchemaType } from "@google/generative-ai";
 import { LocationData } from "@/types";
 import { cache } from 'react';
@@ -166,8 +167,7 @@ export const fetchLocationData = cache(async (location: string, tags: string[] =
             }
         });
 
-        // ★修正2: Unsplash検索とGemini生成を「並列」に実行して時間を節約
-        // 画像検索には入力された location (例: "台北") をそのまま使うことで、Geminiの結果を待たずに検索開始できる
+        // 画像検索とGemini生成を並列実行
         const [geminiResult, headerImageUrl] = await Promise.all([
             model.generateContent(prompt),
             fetchImageFromUnsplash(location) // Unsplashは日本語検索も対応してるのでこれでOK

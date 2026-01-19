@@ -65,20 +65,20 @@ const DashboardClient: React.FC<Props> = ({ initialData, selectedTags }) => {
     };
 
     const renderContent = () => {
-        switch (activeTab) {
-            case 'tourism':
-                return (
-                    <div className="space-y-8">
-                        <TourismInformation 
-                            tourismInfo={initialData.tourismInfo} 
-                            locationName={initialData.locationName} 
-                            industries={initialData.majorIndustries}
-                            economicSnapshot={initialData.economicSnapshot}
-                            // ★ここ修正: 決済情報を渡す！
-                            payment={initialData.payment}
-                        />
-                    </div>
-                );
+    switch (activeTab) {
+        case 'tourism':
+            return (
+                <div className="space-y-8">
+                    <TourismInformation 
+                        tourismInfo={initialData.tourismInfo} 
+                        locationName={initialData.locationName} 
+                        industries={initialData.majorIndustries}
+                        economicSnapshot={initialData.economicSnapshot}
+                        // ★ここ修正: 忘れずに決済情報を渡す！
+                        payment={initialData.payment}
+                    />
+                </div>
+            );
             case 'history':
                 return <HistoryPage events={initialData.historicalTimeline} deepDive={initialData.deepDive} />;
             case 'plan':
