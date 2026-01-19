@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Lora } from "next/font/google";
-import { GoogleAnalytics } from '@next/third-parties/google'; // ★追加
+import { GoogleAnalytics } from '@next/third-parties/google';
 import "./globals.css";
 import "leaflet/dist/leaflet.css";
 
@@ -26,11 +26,14 @@ export const metadata: Metadata = {
     siteName: 'MachiLogue',
     locale: 'ja_JP',
     type: 'website',
+    // ★ images プロパティは削除しました。
+    // app/opengraph-image.tsx がある場合、Next.jsが自動で設定してくれます。
   },
   twitter: {
     card: 'summary_large_image',
     title: "MachiLogue - データで旅するAIガイド",
     description: "世界の都市をデータで可視化するトラベルダッシュボード",
+    // ★ images プロパティは削除しました。
   },
 };
 
@@ -47,7 +50,7 @@ export default function RootLayout({
       </head>
       <body className="bg-gray-50 dark:bg-slate-900 font-sans text-slate-800 dark:text-slate-100 transition-colors duration-300">
         {children}
-        {/* ★Google Analyticsの埋め込み。IDは環境変数から取得します */}
+        {/* Google Analyticsの埋め込み */}
         <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID || ""} />
       </body>
     </html>
