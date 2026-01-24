@@ -1,6 +1,6 @@
 // types/index.ts
 
-export type SearchTag = '金融' | 'トレンド' | 'アート' | '民俗' | '交通・インフラ' | 'グルメ' | '人口流体';
+export type SearchTag = '金融' | 'トレンド' | 'アート' | '民俗' | '交通・インフラ' | 'グルメ' | '人口流体' | '地政学' | '文化' | '宗教・思想' | '食文化' | '産業';
 export type Tab = 'tourism' | 'history' | 'plan';
 
 // ... (既存のEconomicMetricなどの定義はそのまま) ...
@@ -10,7 +10,7 @@ export interface EconomicMetric {
   growth?: string;
 }
 export interface EconomicMetricSimple {
-    value: string;
+  value: string;
 }
 export interface EconomicSnapshotData {
   year: string;
@@ -34,13 +34,13 @@ export interface TimelineEvent {
   historicalContext?: string;
 }
 export interface DeepDive {
-    title: string;
-    summary: string;
-    fullStory: string;
-    source: {
-        name: string;
-        details: string;
-    };
+  title: string;
+  summary: string;
+  fullStory: string;
+  source: {
+    name: string;
+    details: string;
+  };
 }
 export interface ItineraryItem {
   time: string;

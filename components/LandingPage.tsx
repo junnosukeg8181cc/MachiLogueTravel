@@ -1,5 +1,5 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link'; // Linkコンポーネントをimport
 import Icon from './Icon';
 import type { SearchTag } from '../types';
@@ -8,13 +8,24 @@ interface LandingPageProps {
     onSearch: (location: string, tags: SearchTag[]) => void;
 }
 
-const AVAILABLE_TAGS: SearchTag[] = ['金融', 'トレンド', 'アート', '民俗', '交通・インフラ', 'グルメ', '人口流体'];
+const AVAILABLE_TAGS: SearchTag[] = ['金融', '地政学', '文化', '宗教・思想', '交通・インフラ', '食文化', '産業'];
 
 const LandingPage: React.FC<LandingPageProps> = ({ onSearch }) => {
     const [query, setQuery] = useState('');
     const [selectedTags, setSelectedTags] = useState<SearchTag[]>([]);
 
-    const suggestions = ["東京タワー", "パリ", "ギザのピラミッド", "パルテノン神殿"];
+    const [suggestions, setSuggestions] = useState<string[]>([]);
+
+    useEffect(() => {
+        const ALL_SUGGESTIONS = [
+            'イスタンブール', 'ヴェネツィア', 'パナマ運河', 'ジブラルタル', 'サグラダ・ファミリア',
+            'モン・サン・ミシェル', 'ペトラ遺跡', '厳島神社', 'ウォール街', 'ブルジュ・ハリファ',
+            'シンガポール', 'ベルリンの壁跡', 'アンコール・ワット', 'マチュ・ピチュ', 'ポンペイ',
+            '京都', 'ニューヨーク', 'ドバイ', 'サンフランシスコ', 'アムステルダム', '香港'
+        ];
+        const shuffled = [...ALL_SUGGESTIONS].sort(() => 0.5 - Math.random());
+        setSuggestions(shuffled.slice(0, 4));
+    }, []);
 
     const handleFormSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -24,16 +35,14 @@ const LandingPage: React.FC<LandingPageProps> = ({ onSearch }) => {
     };
 
     const toggleTag = (tag: SearchTag) => {
-        setSelectedTags(prev => 
-            prev.includes(tag) 
-                ? prev.filter(t => t !== tag) 
-                : [...prev, tag]
+        setSelectedTags(prev =>
+            prev.includes(tag) ? [] : [tag]
         );
     };
 
     return (
         <div className="min-h-screen w-full flex flex-col items-center justify-center bg-background-light dark:bg-background-dark p-4 transition-colors duration-300">
-            
+
             {/* ヘッダー部分 */}
             <div className="text-center mb-10">
                 <div className="flex items-center justify-center gap-3 font-bold tracking-tight text-primary">
@@ -56,8 +65,8 @@ const LandingPage: React.FC<LandingPageProps> = ({ onSearch }) => {
                         className="w-full px-6 py-4 md:py-5 pr-14 text-base md:text-lg bg-white dark:bg-surface-dark border border-gray-200 dark:border-gray-600 rounded-2xl shadow-soft focus:ring-2 focus:ring-primary focus:outline-none transition-all duration-300 group-hover:shadow-lg"
                         aria-label="検索"
                     />
-                    <button 
-                        type="submit" 
+                    <button
+                        type="submit"
                         className="absolute top-1/2 right-3 -translate-y-1/2 p-3 bg-primary hover:bg-primary-dark rounded-xl text-white shadow-md flex items-center justify-center transition-colors"
                     >
                         <Icon name="search" />
@@ -73,11 +82,10 @@ const LandingPage: React.FC<LandingPageProps> = ({ onSearch }) => {
                                 type="button"
                                 key={tag}
                                 onClick={() => toggleTag(tag)}
-                                className={`px-4 py-2 text-sm rounded-full border transition-all duration-200 flex items-center gap-1.5 ${
-                                    selectedTags.includes(tag)
-                                        ? 'bg-primary text-white border-primary shadow-md'
-                                        : 'bg-white/80 dark:bg-surface-dark/80 text-slate-600 dark:text-slate-300 border-gray-200 dark:border-gray-700 hover:border-primary/50 hover:bg-white dark:hover:bg-surface-dark'
-                                }`}
+                                className={`px-4 py-2 text-sm rounded-full border transition-all duration-200 flex items-center gap-1.5 ${selectedTags.includes(tag)
+                                    ? 'bg-primary text-white border-primary shadow-md'
+                                    : 'bg-white/80 dark:bg-surface-dark/80 text-slate-600 dark:text-slate-300 border-gray-200 dark:border-gray-700 hover:border-primary/50 hover:bg-white dark:hover:bg-surface-dark'
+                                    }`}
                             >
                                 {selectedTags.includes(tag) && <Icon name="check" className="text-xs" />}
                                 {tag}
@@ -106,7 +114,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onSearch }) => {
 
                 {/* ★追加: MachiLogueとは？へのリンク */}
                 <div>
-                    <Link 
+                    <Link
                         href="/about"
                         className="inline-flex items-center gap-2 text-sm text-slate-400 hover:text-primary transition-colors border-b border-transparent hover:border-primary pb-0.5"
                     >

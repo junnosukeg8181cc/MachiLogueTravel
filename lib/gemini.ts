@@ -119,8 +119,8 @@ export const fetchLocationData = cache(async (location: string, tags: string[] =
     const modelId = "gemini-2.5-flash-lite";
 
     // タグがある場合の詳細指示
-    const tagsInstruction = tags.length > 0 
-        ? `\n**【最重要】ユーザーの関心テーマ:**\nユーザーは特に以下の分野に興味があります: ${tags.join(', ')}。\n歴史タイムライン、Deep Dive (fullStory)、旅行プランを作成する際は、これらのテーマに関連する出来事やスポット、文脈を優先的に取り上げてください。` 
+    const tagsInstruction = tags.length > 0
+        ? `\n**【最重要】コアテーマ: ${tags[0]}**\nユーザーはこの都市の「${tags[0]}」について深く学びたいと考えています。\n以下のセクションでは、一般的な情報は最小限にし、**「${tags[0]}」に関連する情報**を最優先で生成してください。\n\n1. **historicalTimeline**: ${tags[0]}に焦点を当てた歴史年表を作成してください。その都市における${tags[0]}の起源、発展、転換点となる出来事を選定し、歴史的背景を学べるようにしてください。\n2. **Deep Dive (fullStory)**: ${tags[0]}をテーマに、その都市の歴史的変遷や独自の文化、現在への影響を物語として記述してください。\n3. **travelPlan**: ${tags[0]}の歴史や現場を巡る、テーマ特化型の旅程を提案してください。`
         : "";
 
     // プロンプト定義
@@ -175,9 +175,9 @@ export const fetchLocationData = cache(async (location: string, tags: string[] =
 
         const response = await geminiResult.response;
         const jsonText = response.text();
-        
+
         if (!jsonText) throw new Error("Empty response");
-        
+
         const data = JSON.parse(jsonText);
 
         // 並列取得した画像をデータにマージ

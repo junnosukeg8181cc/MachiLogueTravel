@@ -9,8 +9,8 @@ interface PlanPageProps {
 
 const PlanPage: React.FC<PlanPageProps> = ({ plan }) => {
     if (!plan) {
-         return (
-             <div className="bg-white dark:bg-surface-dark rounded-2xl shadow-card p-8 border border-gray-100 dark:border-gray-700 animate-pulse">
+        return (
+            <div className="bg-white dark:bg-surface-dark rounded-2xl shadow-card p-8 border border-gray-100 dark:border-gray-700 animate-pulse">
                 <div className="h-8 w-3/4 bg-gray-200 dark:bg-gray-700 rounded mb-4 mx-auto"></div>
                 <div className="h-4 w-full bg-gray-200 dark:bg-gray-700 rounded mb-8 max-w-lg mx-auto"></div>
                 <div className="space-y-6">
@@ -25,9 +25,9 @@ const PlanPage: React.FC<PlanPageProps> = ({ plan }) => {
                     ))}
                 </div>
             </div>
-         );
+        );
     }
-    
+
     return (
         <section>
             <div className="bg-white dark:bg-surface-dark rounded-2xl shadow-card p-8 border border-gray-100 dark:border-gray-700">
@@ -36,16 +36,16 @@ const PlanPage: React.FC<PlanPageProps> = ({ plan }) => {
                     <h2 className="text-3xl font-bold text-slate-900 dark:text-white">{plan.title}</h2>
                     <p className="text-gray-500 dark:text-gray-400 mt-2 max-w-2xl mx-auto">{plan.description}</p>
                 </div>
-                
+
                 <div className="space-y-8 border-t border-gray-200 dark:border-gray-700 pt-8">
                     {plan.itinerary.map((item, index) => (
                         <div key={index} className="flex gap-6 items-start">
-                            <div className="flex flex-col items-center">
+                            <div className="flex flex-col items-center flex-shrink-0">
                                 <div className="w-16 h-16 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex-shrink-0 flex items-center justify-center text-primary dark:text-blue-400">
                                     {/* ★修正: text-3xl に leading-none を追加 */}
                                     <Icon name={item.icon} className="text-3xl leading-none" />
                                 </div>
-                                 <span className="text-xs font-bold text-gray-500 dark:text-gray-400 mt-2 whitespace-nowrap">{item.time}</span>
+                                <span className="text-xs font-bold text-gray-500 dark:text-gray-400 mt-2 whitespace-nowrap">{item.time}</span>
                             </div>
                             <div className="mt-1">
                                 <h3 className="font-bold text-lg text-slate-800 dark:text-slate-100">{item.title}</h3>
