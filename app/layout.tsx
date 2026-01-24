@@ -10,10 +10,10 @@ const lora = Lora({ subsets: ["latin"], variable: "--font-lora", style: ["normal
 export const metadata: Metadata = {
   // サイトのベースURL設定
   metadataBase: new URL('https://machi-logue-travel.vercel.app'),
-  
+
   title: "MachiLogue - 世界の都市をデータで探求する",
   description: "観光、歴史、経済データをAIが可視化するトラベルダッシュボード",
-  
+
   // Search Consoleの所有権確認コード
   verification: {
     google: 'EwekBe2YOZRPisPcGPqlydeRYZWnMUb7bP9s1htLzdc',
@@ -26,14 +26,13 @@ export const metadata: Metadata = {
     siteName: 'MachiLogue',
     locale: 'ja_JP',
     type: 'website',
-    // ★ images プロパティは削除しました。
-    // app/opengraph-image.tsx がある場合、Next.jsが自動で設定してくれます。
+    images: ['/rogo.png'],
   },
   twitter: {
     card: 'summary_large_image',
     title: "MachiLogue - データで旅するAIガイド",
     description: "世界の都市をデータで可視化するトラベルダッシュボード",
-    // ★ images プロパティは削除しました。
+    images: ['/rogo.png'],
   },
 };
 

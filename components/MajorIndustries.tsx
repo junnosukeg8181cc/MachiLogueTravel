@@ -18,7 +18,7 @@ const iconColors: { [key: string]: string } = {
 const MajorIndustries: React.FC<MajorIndustriesProps> = ({ industries }) => {
     return (
         <section>
-            <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-6">主要産業</h3>
+
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {industries.map((industry) => (
                     <div key={industry.name} className="bg-white dark:bg-surface-dark border border-gray-100 dark:border-gray-700 rounded-xl p-4 flex flex-col items-center justify-center gap-2 hover:border-primary/50 transition cursor-default shadow-sm group">
