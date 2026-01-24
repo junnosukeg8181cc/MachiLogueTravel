@@ -6,24 +6,53 @@ import { cache } from 'react';
 // サーバー側の環境変数からキーを取得
 const apiKey = process.env.GEMINI_API_KEY;
 const unsplashAccessKey = process.env.UNSPLASH_ACCESS_KEY;
+const pexelsApiKey = process.env.PEXELS_API_KEY;
 
 const genAI = new GoogleGenerativeAI(apiKey || "");
 
-// Unsplash画像検索
-const fetchImageFromUnsplash = async (query: string): Promise<string> => {
-    if (!unsplashAccessKey) return "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=1200&q=80";
+// デフォルト画像
+const DEFAULT_IMAGE = "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=1200&q=80";
+
+// Pexels画像検索
+const fetchImageFromPexels = async (query: string): Promise<string | null> => {
+    if (!pexelsApiKey) return null;
 
     try {
         const response = await fetch(
-            `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&per_page=1&orientation=landscape`,
-            { headers: { Authorization: `Client-ID ${unsplashAccessKey}` } }
+            `https://api.pexels.com/v1/search?query=${encodeURIComponent(query)}&per_page=1&orientation=landscape`,
+            { headers: { Authorization: pexelsApiKey } }
         );
         const data = await response.json();
-        return data.results?.[0]?.urls?.regular || "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=1200&q=80";
+        return data.photos?.[0]?.src?.landscape || null;
     } catch (e) {
-        console.error("Image fetch error:", e);
-        return "https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?auto=format&fit=crop&w=1200&q=80";
+        console.error("Pexels fetch error:", e);
+        return null;
     }
+};
+
+// 画像検索 (Unsplash -> Pexels -> Default)
+const fetchImage = async (query: string): Promise<string> => {
+    // 1. Try Unsplash
+    if (unsplashAccessKey) {
+        try {
+            const response = await fetch(
+                `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&per_page=1&orientation=landscape`,
+                { headers: { Authorization: `Client-ID ${unsplashAccessKey}` } }
+            );
+            const data = await response.json();
+            const url = data.results?.[0]?.urls?.regular;
+            if (url) return url;
+        } catch (e) {
+            console.error("Unsplash fetch error:", e);
+        }
+    }
+
+    // 2. Try Pexels (Fallback)
+    const pexelsImage = await fetchImageFromPexels(query);
+    if (pexelsImage) return pexelsImage;
+
+    // 3. Fallback to Default
+    return DEFAULT_IMAGE;
 };
 
 // スキーマ定義
@@ -170,7 +199,7 @@ export const fetchLocationData = cache(async (location: string, tags: string[] =
         // 画像検索とGemini生成を並列実行
         const [geminiResult, headerImageUrl] = await Promise.all([
             model.generateContent(prompt),
-            fetchImageFromUnsplash(location) // Unsplashは日本語検索も対応してるのでこれでOK
+            fetchImage(location) // Unsplash -> Pexels -> Default
         ]);
 
         const response = await geminiResult.response;
