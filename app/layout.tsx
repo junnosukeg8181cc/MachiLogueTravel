@@ -26,13 +26,11 @@ export const metadata: Metadata = {
     siteName: 'MachiLogue',
     locale: 'ja_JP',
     type: 'website',
-    images: ['/rogo.png'],
   },
   twitter: {
     card: 'summary_large_image',
     title: "MachiLogue - データで旅するAIガイド",
     description: "世界の都市をデータで可視化するトラベルダッシュボード",
-    images: ['/rogo.png'],
   },
 };
 
