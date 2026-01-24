@@ -35,3 +35,22 @@ export const getLocationData = async (locationName: string, tags: string[] = [])
 
   return geminiData;
 };
+
+// ★追加: キャッシュのみを確認し、なければ null を返す (Metadata生成用)
+export const getCachedLocationData = async (locationName: string, tags: string[] = []): Promise<LocationData | null> => {
+  const tagsKey = tags.slice().sort().join(',');
+
+  const { data: rows } = await supabase
+    .from('locations')
+    .select('data')
+    .eq('city_name', locationName)
+    .eq('tags', tagsKey)
+    .limit(1);
+
+  if (rows && rows.length > 0) {
+    console.log(`Cache HIT (Metadata) for: ${locationName}`);
+    return rows[0].data as LocationData;
+  }
+
+  return null;
+};

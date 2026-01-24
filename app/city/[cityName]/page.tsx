@@ -15,20 +15,38 @@ type Props = {
 
 
 
-// AIを待たず、都市名に基づいて画像を割り当てる「爆速メタデータ」
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+// AIを待たず、都市名に基づいて画像を割り当てる「爆速メタデータ」 ... ではなく、概要取得のためにデータフェッチを行う
+// ★修正: キャッシュがある時だけAI概要を使い、ない時は汎用テキストで高速化する
+import { getCachedLocationData } from '@/lib/actions';
+
+export async function generateMetadata({ params, searchParams }: Props): Promise<Metadata> {
   const { cityName } = await params;
+  const { tags } = await searchParams;
   const decodedName = decodeURIComponent(cityName);
+  const tagList = tags ? tags.split(',') : [];
 
+  // 1. キャッシュからのみデータ取得を試みる (高速)
+  const data = await getCachedLocationData(decodedName, tagList);
 
+  // ハッシュタグ生成
+  const hashtags = [`#${decodedName}`, ...tagList.map(t => `#${t}`)].join(' ');
+
+  let description = "";
+
+  if (data) {
+    // キャッシュヒット: AI生成された詳細な概要を使う
+    description = `${data.subtitle} ${hashtags}`;
+  } else {
+    // キャッシュミス: ページ読み込みをブロックしないよう、汎用テキストを使う
+    description = `${decodedName}の観光地概要と詳細データ。歴史、経済、文化をAIが多角的に分析したトラベルダッシュボード。 ${hashtags}`;
+  }
 
   return {
     title: `${decodedName}の観光・歴史・経済データ | MachiLogue`,
-    // ★ここを修正：「旅行プラン」を削って「観光地概要」にフォーカス
-    description: `${decodedName}の観光地概要と詳細データ。歴史、経済、文化をAIが多角的に分析したトラベルダッシュボード。`,
+    description: description,
     openGraph: {
       title: `${decodedName} - MachiLogue`,
-      description: `${decodedName}の観光地概要と詳細データを確認する`,
+      description: description,
       // images: opengraph-image.tsx が自動的に補完する
     },
   };
