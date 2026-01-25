@@ -9,7 +9,7 @@ export const size = {
 };
 export const contentType = 'image/png';
 
-// ここが画像生成の本体や
+// ここが画像生成の本体や (Cache Buster: Updated color)
 export default function Image() {
     // あの青紫グラデーションの「M」アイコンのSVGや。
     // ※もし正確なSVGデータを持ってるなら、<path d="...">の中身をそれに差し替えてな。

@@ -2,9 +2,18 @@ import React, { useState } from 'react';
 import type { TimelineEvent, DeepDive } from '../types';
 import Icon from './Icon';
 
-// アイコンの色定義
-const timelineIconColors: { [key: string]: string } = {
-    "default": "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300"
+const getColorClasses = (colorKey?: string) => {
+    switch (colorKey?.toLowerCase()) {
+        case 'red': return "bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-100 dark:border-red-900";
+        case 'blue': return "bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 border-blue-100 dark:border-blue-900";
+        case 'green': return "bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 border-green-100 dark:border-green-900";
+        case 'yellow': return "bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-400 border-yellow-100 dark:border-yellow-900";
+        case 'purple': return "bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400 border-purple-100 dark:border-purple-900";
+        case 'orange': return "bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 border-orange-100 dark:border-orange-900";
+        case 'teal': return "bg-teal-50 dark:bg-teal-900/20 text-teal-600 dark:text-teal-400 border-teal-100 dark:border-teal-900";
+        case 'pink': return "bg-pink-50 dark:bg-pink-900/20 text-pink-600 dark:text-pink-400 border-pink-100 dark:border-pink-900";
+        default: return "bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 border-gray-200 dark:border-gray-600";
+    }
 };
 
 // --- Deep Dive Card Component ---
@@ -59,8 +68,6 @@ const HistoryPage: React.FC<{ events: TimelineEvent[], deepDive: DeepDive }> = (
         return <p className="p-8 text-center text-slate-500">歴史データがありません。</p>;
     }
 
-    const getIconColor = (title: string) => timelineIconColors[title] || timelineIconColors.default;
-
     return (
         <div className="max-w-4xl mx-auto space-y-12">
             <section>
@@ -74,8 +81,7 @@ const HistoryPage: React.FC<{ events: TimelineEvent[], deepDive: DeepDive }> = (
                                     <div className="absolute top-12 bottom-0 left-6 -ml-px w-[2px] bg-slate-100 dark:bg-slate-800"></div>
                                 )}
                                 <div className="z-10 flex-shrink-0 w-12">
-                                    <div className={`w-12 h-12 rounded-full border-4 border-white dark:border-slate-900 flex items-center justify-center shadow-sm ${getIconColor(event.title)}`}>
-                                        {/* ★修正: text-xl に leading-none を追加 */}
+                                    <div className={`w-12 h-12 rounded-full border-4 flex items-center justify-center shadow-sm ${getColorClasses(event.color)}`}>
                                         <Icon name={event.icon} className="text-xl leading-none" />
                                     </div>
                                 </div>

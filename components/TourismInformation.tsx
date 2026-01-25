@@ -5,7 +5,7 @@ import Icon from './Icon';
 import type { TourismInfo, Industry, EconomicSnapshotData, PaymentInfo as PaymentType } from '@/types';
 
 // 地図と天気は動的インポート
-const CityMap = dynamic(() => import('./CityMap'), { 
+const CityMap = dynamic(() => import('./CityMap'), {
     ssr: false,
     loading: () => <div className="h-[400px] bg-gray-100 dark:bg-gray-800 animate-pulse rounded-2xl" />
 });
@@ -21,8 +21,8 @@ interface TourismInformationProps {
     payment: PaymentType;
 }
 
-const TourismInformation: React.FC<TourismInformationProps> = ({ 
-    tourismInfo, 
+const TourismInformation: React.FC<TourismInformationProps> = ({
+    tourismInfo,
     locationName,
     industries,
     economicSnapshot,
@@ -87,11 +87,12 @@ const TourismInformation: React.FC<TourismInformationProps> = ({
     );
 
     return (
-        <section className="space-y-10">
-            {/* 1. 観光サマリと地図 */}
+        <section className="space-y-12">
+
+            {/* 1. 観光サマリと地図 (概要と地図) */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                
-                {/* 概要テキスト（orderクラスを削除：これでスマホでは上に来る） */}
+
+                {/* 概要テキスト */}
                 {tourismSummary && (
                     <div className="flex flex-col">
                         <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-4 flex items-center gap-2">
@@ -106,19 +107,18 @@ const TourismInformation: React.FC<TourismInformationProps> = ({
                     </div>
                 )}
 
-                {/* 地図（orderクラスを削除：これでスマホでは下に来る） */}
+                {/* 地図 */}
                 <div className="flex flex-col">
-                     <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-4 flex items-center gap-2">
+                    <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-4 flex items-center gap-2">
                         <Icon name="map" className="text-primary" />
                         地図
                     </h3>
-                     <div className="h-[300px] lg:h-full min-h-[300px] rounded-2xl overflow-hidden shadow-card border border-gray-100 dark:border-gray-700 relative z-0">
+                    <div className="h-[300px] lg:h-full min-h-[300px] rounded-2xl overflow-hidden shadow-card border border-gray-100 dark:border-gray-700 relative z-0">
                         <CityMap tourismInfo={tourismInfo} locationName={locationName} />
                     </div>
                 </div>
             </div>
-
-            {/* 2. 天気予報 */}
+            {/* 5. 天気予報 */}
             <div>
                 <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-4 flex items-center gap-2">
                     <Icon name="wb_sunny" className="text-primary" />
@@ -127,41 +127,41 @@ const TourismInformation: React.FC<TourismInformationProps> = ({
                 <WeatherForecast latitude={latitude} longitude={longitude} />
             </div>
 
-            {/* 3. 基本情報 & マネー */}
+            {/* 2. 基本情報 & マネー */}
             <div>
                 <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-4 flex items-center gap-2">
                     <Icon name="info" className="text-primary" />
                     基本情報 & マネー
                 </h3>
-                
+
                 <div className="space-y-4">
                     {/* 上段：中心都市と言語 */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <InfoCard>
-                            <InfoItem 
-                                icon="place" 
-                                label="地域の中心" 
-                                value={regionalCenter} 
-                                subValue={distanceFromCenter} 
+                            <InfoItem
+                                icon="place"
+                                label="地域の中心"
+                                value={regionalCenter}
+                                subValue={distanceFromCenter}
                             />
                         </InfoCard>
-                        
+
                         <InfoCard>
-                            <InfoItem 
-                                icon="language" 
-                                label="主要言語" 
-                                value={language} 
+                            <InfoItem
+                                icon="language"
+                                label="主要言語"
+                                value={language}
                             />
                         </InfoCard>
                     </div>
 
                     {/* 下段：決済情報の統合カード */}
                     <InfoCard className="bg-gradient-to-br from-white to-slate-50 dark:from-surface-dark dark:to-slate-800/50 relative overflow-hidden">
-                         {/* 背景の装飾アイコン */}
+                        {/* 背景の装飾アイコン */}
                         <Icon name="payments" className="absolute -bottom-10 -right-4 text-[10rem] text-primary/5 dark:text-primary/10 pointer-events-none" />
 
                         <div className="relative z-10 flex flex-col md:flex-row md:items-center gap-6 p-2">
-                            
+
                             {/* 左側：通貨情報 */}
                             <div className="flex items-start gap-4 md:w-1/3">
                                 <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 dark:bg-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400 flex-shrink-0">
@@ -187,8 +187,8 @@ const TourismInformation: React.FC<TourismInformationProps> = ({
                                         {/* 決済事情 */}
                                         <div>
                                             <div className="flex items-center gap-2 mb-2 text-slate-700 dark:text-slate-200 font-bold text-sm">
-                                                 <Icon name="credit_card" className="text-blue-500" />
-                                                 決済事情
+                                                <Icon name="credit_card" className="text-blue-500" />
+                                                決済事情
                                             </div>
                                             <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
                                                 {payment.cardInfo}
@@ -197,16 +197,16 @@ const TourismInformation: React.FC<TourismInformationProps> = ({
                                                 ※{payment.cashInfo}
                                             </p>
                                         </div>
-                                        {/* チップ */}
+                                        {/* チップ + 物価感一言 */}
                                         <div>
                                             <div className="flex items-center gap-2 mb-2 text-slate-700 dark:text-slate-200 font-bold text-sm">
-                                                 <Icon name="savings" className="text-amber-500" />
-                                                 チップ
+                                                <Icon name="savings" className="text-amber-500" />
+                                                チップ & 予算感
                                             </div>
-                                             <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
+                                            <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed font-medium">
                                                 {payment.tipping}
                                             </p>
-                                            <p className="text-[10px] text-slate-500 dark:text-slate-500 mt-1">
+                                            <p className="text-[10px] text-slate-500 dark:text-slate-500 mt-1 mb-2">
                                                 {payment.tippingRate}
                                             </p>
                                         </div>
@@ -222,10 +222,17 @@ const TourismInformation: React.FC<TourismInformationProps> = ({
                 </div>
             </div>
 
+            {/* 3. City DNA & Pulse (経済スナップショット) - ここに配置！ */}
+            {economicSnapshot && (
+                <div>
+                    <EconomicSnapshot data={economicSnapshot} />
+                </div>
+            )}
+
             {/* 4. 主要産業 */}
             {industries && industries.length > 0 && (
                 <div>
-                     <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-4 flex items-center gap-2">
+                    <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-4 flex items-center gap-2">
                         <Icon name="factory" className="text-primary" />
                         主要産業
                     </h3>
@@ -233,16 +240,8 @@ const TourismInformation: React.FC<TourismInformationProps> = ({
                 </div>
             )}
 
-            {/* 5. 経済スナップショット */}
-            {economicSnapshot && (
-                 <div>
-                     <h3 className="text-lg font-semibold text-slate-800 dark:text-slate-200 mb-4 flex items-center gap-2">
-                        <Icon name="query_stats" className="text-primary" />
-                        経済指標
-                    </h3>
-                    <EconomicSnapshot data={economicSnapshot} />
-                </div>
-            )}
+
+
         </section>
     );
 };

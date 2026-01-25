@@ -27,21 +27,93 @@ const locationSchema = {
             properties: {
                 year: { type: SchemaType.STRING },
                 dataScope: { type: SchemaType.STRING },
-                gdp: { type: SchemaType.OBJECT, properties: { value: { type: SchemaType.STRING }, currency: { type: SchemaType.STRING }, growth: { type: SchemaType.STRING } }, required: ["value", "currency", "growth"] },
-                tradeVolume: { type: SchemaType.OBJECT, properties: { value: { type: SchemaType.STRING }, currency: { type: SchemaType.STRING } }, required: ["value", "currency"] },
-                annualVisitors: { type: SchemaType.OBJECT, properties: { value: { type: SchemaType.STRING } }, required: ["value"] },
-                unemploymentRate: { type: SchemaType.OBJECT, properties: { value: { type: SchemaType.STRING } }, required: ["value"] },
-                inflationRate: { type: SchemaType.OBJECT, properties: { value: { type: SchemaType.STRING } }, required: ["value"] }
+                cityPulse: { type: SchemaType.STRING, description: "A catchy phrase describing the city's current vibe" },
+                livingCost: {
+                    type: SchemaType.OBJECT,
+                    properties: {
+                        index: { type: SchemaType.STRING, enum: ["Low", "Medium", "High", "Very High"] },
+                        coffeePrice: { type: SchemaType.STRING, description: "Price of a latte" },
+                        insight: { type: SchemaType.STRING, description: "Insight about living cost in friendly polite Japanese (NO DIALECTS)" }
+                    },
+                    required: ["index", "coffeePrice", "insight"]
+                },
+                gdp: {
+                    type: SchemaType.OBJECT,
+                    properties: {
+                        value: { type: SchemaType.STRING },
+                        currency: { type: SchemaType.STRING },
+                        growth: { type: SchemaType.STRING },
+                        comparison: { type: SchemaType.STRING },
+                        insight: { type: SchemaType.STRING }
+                    },
+                    required: ["value", "currency", "growth", "comparison", "insight"]
+                },
+                tradeVolume: {
+                    type: SchemaType.OBJECT,
+                    properties: {
+                        value: { type: SchemaType.STRING },
+                        currency: { type: SchemaType.STRING },
+                        comparison: { type: SchemaType.STRING },
+                        insight: { type: SchemaType.STRING }
+                    },
+                    required: ["value", "currency", "comparison", "insight"]
+                },
+                annualVisitors: {
+                    type: SchemaType.OBJECT,
+                    properties: {
+                        value: { type: SchemaType.STRING },
+                        comparison: { type: SchemaType.STRING },
+                        insight: { type: SchemaType.STRING }
+                    },
+                    required: ["value", "comparison", "insight"]
+                },
+                unemploymentRate: {
+                    type: SchemaType.OBJECT,
+                    properties: {
+                        value: { type: SchemaType.STRING },
+                        comparison: { type: SchemaType.STRING },
+                        insight: { type: SchemaType.STRING }
+                    },
+                    required: ["value", "comparison", "insight"]
+                },
+                inflationRate: {
+                    type: SchemaType.OBJECT,
+                    properties: {
+                        value: { type: SchemaType.STRING },
+                        comparison: { type: SchemaType.STRING },
+                        insight: { type: SchemaType.STRING }
+                    },
+                    required: ["value", "comparison", "insight"]
+                }
             },
-            required: ["year", "dataScope", "gdp", "tradeVolume", "annualVisitors", "unemploymentRate", "inflationRate"],
+            required: ["year", "dataScope", "cityPulse", "livingCost", "gdp", "tradeVolume", "annualVisitors", "unemploymentRate", "inflationRate"],
         },
         majorIndustries: {
             type: SchemaType.ARRAY,
-            items: { type: SchemaType.OBJECT, properties: { name: { type: SchemaType.STRING }, icon: { type: SchemaType.STRING }, colorKey: { type: SchemaType.STRING } }, required: ["name", "icon", "colorKey"] },
+            items: {
+                type: SchemaType.OBJECT,
+                properties: {
+                    name: { type: SchemaType.STRING },
+                    icon: { type: SchemaType.STRING },
+                    colorKey: { type: SchemaType.STRING },
+                    color: { type: SchemaType.STRING, description: "Color suggestion: Red, Blue, Green, Yellow, Purple, Orange, Teal, Pink" }
+                },
+                required: ["name", "icon", "colorKey", "color"]
+            },
         },
         historicalTimeline: {
             type: SchemaType.ARRAY,
-            items: { type: SchemaType.OBJECT, properties: { year: { type: SchemaType.STRING }, title: { type: SchemaType.STRING }, description: { type: SchemaType.STRING }, icon: { type: SchemaType.STRING } }, required: ["year", "title", "description", "icon"] },
+            items: {
+                type: SchemaType.OBJECT,
+                properties: {
+                    year: { type: SchemaType.STRING },
+                    title: { type: SchemaType.STRING },
+                    description: { type: SchemaType.STRING },
+                    icon: { type: SchemaType.STRING },
+                    color: { type: SchemaType.STRING, description: "Color suggestion for the event type: Red, Blue, Green, Yellow, Purple, Orange, Teal, Pink" }
+                },
+                required: ["year", "title", "description", "icon", "color"]
+            },
         },
         deepDive: {
             type: SchemaType.OBJECT,
@@ -137,12 +209,20 @@ export const fetchLocationData = cache(async (location: string, tags: string[] =
             - currencyCodeは必ず3文字のISOコード（例: USD）で出力してください。
             - 観光情報サマリは日本語で300文字程度で記述してください。
         
-        - **決済・お金事情 (payment): ★追加項目**
+            - **cityPulse**: この街の現在の「鼓動」を伝える短いキャッチコピー（例：「アジアの熱気と欧州の気品が交差する金融ハブ」）。
+            - **insight (各指標)**: その数字が旅行者の体験にどう影響するかを、**標準語の丁寧語（デス・マス調）**で1行でコメントしてください。**関西弁、方言、タメ口は禁止です。**
+            - **livingCost**: コーヒー1杯の価格などを具体的に出し、現地の金銭感覚を伝えてください。
+            
+        - **決済・お金事情 (payment):**
             - currency: 現地通貨名
             - cashInfo: 現金の必要性（例：「屋台や地方では必須」「ほぼ完全キャッシュレス」など簡潔に）
             - cardInfo: クレジットカード事情（例：「VISA/Masterはどこでも使える」「JCBは一部のみ」など）
             - tipping: チップ文化の有無（例：「義務」「気持ち程度」「不要」）
             - tippingRate: チップの相場（例：「会計の10-15%」「端数を切り上げる程度」）
+        
+        - **Colors (icons): ★追加**
+            - majorIndustriesとhistoricalTimelineの各項目に、その内容に合った色 (color) を指定してください。
+            - 選択肢: Red, Blue, Green, Yellow, Purple, Orange, Teal, Pink
     `;
 
     try {

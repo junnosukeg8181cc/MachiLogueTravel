@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 export default function AboutPage() {
   return (
     <div className="min-h-screen bg-background-light dark:bg-background-dark text-slate-800 dark:text-slate-200 transition-colors duration-300">
-      
+
       {/* ヘッダー的なナビゲーション */}
       <nav className="p-6 flex justify-between items-center max-w-5xl mx-auto">
         <Link href="/" className="flex items-center gap-2 font-bold text-primary hover:opacity-80 transition">
@@ -28,31 +28,31 @@ export default function AboutPage() {
       </nav>
 
       <main className="max-w-4xl mx-auto px-6 py-12 md:py-20 space-y-24">
-        
+
         {/* ヒーローセクション */}
         <section className="text-center space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight">
-            旅は、<span className="text-primary">データ</span>で<br className="md:hidden"/>もっと深くなる。
+            旅は、<span className="text-primary">データ</span>で<br className="md:hidden" />もっと深くなる。
           </h1>
           <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed">
-            MachiLogue（マチローグ）は、AIとビッグデータを活用して<br className="hidden md:inline"/>
+            MachiLogue（マチローグ）は、AIとビッグデータを活用して<br className="hidden md:inline" />
             世界の都市を「解剖」する、新しい形のトラベル・インテリジェンスツールです。
           </p>
         </section>
 
         {/* 3つの特徴（SEOキーワード: 経済データ, 歴史, AI旅程） */}
         <section className="grid md:grid-cols-3 gap-8">
-          <FeatureCard 
+          <FeatureCard
             icon="analytics"
             title="都市の「今」を数値化"
             description="GDP、物価指数、為替、産業構造。ガイドブックには載らないリアルな経済データを可視化し、その街の本当の姿を浮き彫りにします。"
           />
-          <FeatureCard 
+          <FeatureCard
             icon="history_edu"
             title="歴史を「物語」として"
             description="単なる年号の羅列ではなく、その都市が歩んできたストーリーをAIが要約。現代の風景に隠された歴史的背景を深く理解できます。"
           />
-          <FeatureCard 
+          <FeatureCard
             icon="flight_takeoff"
             title="AIによる最適プラン"
             description="あなたの興味（金融、アート、グルメなど）に合わせて、AIが最適な観光ルートと立ち寄りスポットを瞬時に提案します。"
@@ -75,7 +75,7 @@ export default function AboutPage() {
         <section className="text-center space-y-8">
           <h2 className="text-3xl font-bold">さあ、知的冒険へ。</h2>
           <div className="flex justify-center">
-            <Link 
+            <Link
               href="/"
               className="group relative inline-flex items-center gap-3 px-8 py-4 bg-primary hover:bg-primary-dark text-white rounded-full text-lg font-bold transition-all shadow-lg hover:shadow-xl hover:-translate-y-1"
             >
@@ -92,7 +92,7 @@ export default function AboutPage() {
       </main>
 
       <footer className="py-8 text-center text-sm text-slate-400 dark:text-slate-600 border-t border-gray-100 dark:border-gray-800 mt-12">
-        <p>© 2026 MachiLogue - Powered by Gemini AI & Next.js</p>
+        <p>© 2026 MachiLogue</p>
       </footer>
     </div>
   );

@@ -8,13 +8,25 @@ export interface EconomicMetric {
   value: string;
   currency?: string;
   growth?: string;
+  comparison?: string; // e.g. "東京都の約1.2倍"
+  insight?: string;    // e.g. "物価は高いけど、その分給料もええから生活水準は高いで"
 }
 export interface EconomicMetricSimple {
   value: string;
+  comparison?: string;
+  insight?: string;
 }
+export interface LivingCost {
+  index: 'Low' | 'Medium' | 'High' | 'Very High';
+  coffeePrice: string; // e.g. "550円"
+  insight: string;     // e.g. "ランチは1000円超えるのが普通やな"
+}
+
 export interface EconomicSnapshotData {
   year: string;
   dataScope: string;
+  cityPulse: string;   // e.g. "アジアの熱気が渦巻く、眠らない金融都市"
+  livingCost: LivingCost;
   gdp: EconomicMetric;
   tradeVolume: EconomicMetric;
   annualVisitors: EconomicMetric;
@@ -25,6 +37,7 @@ export interface Industry {
   name: string;
   icon: string;
   colorKey: string;
+  color?: string; // e.g. "Blue", "Red" - Gemini generated color hint
 }
 export interface TimelineEvent {
   year: string;
@@ -32,6 +45,7 @@ export interface TimelineEvent {
   description: string;
   icon: string;
   historicalContext?: string;
+  color?: string; // e.g. "Blue", "Red"
 }
 export interface DeepDive {
   title: string;
